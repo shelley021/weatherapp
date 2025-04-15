@@ -1,0 +1,46 @@
+name: WeatherApp CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install buildozer
+
+    - name: Run WeatherApp
+      env:
+        OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+      run: |
+        python weatherapp.py &
+        sleep 5
+        pkill python
+
+    - name: Build APK
+      run: |
+        buildozer init
+        echo "[app]\ntitle = WeatherApp\npackage.name = weatherapp\nsource.dir = .\nsource.include_exts = py,kv\nrequirements = python3,kivy,requests,python-dotenv\nversion = 0.1\nicon = icon.png\norientation = portrait\n[buildozer]\nlog_level = 2" > buildozer.spec
+        buildozer android debug
+      continue-on-error: true
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: weatherapp-apk
+        path: bin/*.apk
