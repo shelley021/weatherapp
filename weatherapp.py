@@ -17,7 +17,7 @@ class WeatherApp(BoxLayout):
         self.padding = 10
         self.spacing = 10
 
-        self.city_input = TextInput(hint_text="Enter city (e.g., Chongqing)", size_hint=(1, 0.2))
+        self.city_input = TextInput(hint_text="Enter city (e.g., Chongqing)", multiline=False, size_hint=(1, 0.2))
         self.search_button = Button(text="Get Weather", size_hint=(1, 0.2))
         self.weather_label = Label(text="Weather will appear here", size_hint=(1, 0.6))
 
@@ -32,11 +32,14 @@ class WeatherApp(BoxLayout):
             self.weather_label.text = "Please enter a city!"
             return
         
-        # 使用https协议并添加超时参数
+        if not OPENWEATHER_API_KEY:
+            self.weather_label.text = "API key not configured!"
+            return
+            
         url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={OPENWEATHER_API_KEY}&units=metric"
         try:
             response = requests.get(url, timeout=10)
-            response.raise_for_status()  # 检查HTTP错误
+            response.raise_for_status()
             data = response.json()
             if data.get("cod") != 200:
                 self.weather_label.text = f"Error: {data.get('message', 'City not found')}"
