@@ -23,6 +23,10 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev libsdl2-dev libsdl2-ttf-dev
+        # 安装Android NDK
+        wget https://dl.google.com/android/repository/android-ndk-r25b-linux.zip
+        unzip android-ndk-r25b-linux.zip -d /usr/local/lib/android/sdk/ndk
+        echo "export ANDROID_NDK_HOME=/usr/local/lib/android/sdk/ndk/android-ndk-r25b" >> $GITHUB_ENV
 
     - name: Install Python dependencies
       run: |
@@ -46,7 +50,7 @@ title = WeatherApp
 package.name = weatherapp
 package.domain = org.weatherapp
 source.dir = .
-source.include_exts = py,kv
+source.include_exts = py,kv,env
 version = 0.1
 requirements = python3==3.10.13,kivy==2.3.1,requests,python-dotenv,openssl
 orientation = portrait
