@@ -31,9 +31,12 @@ class WeatherApp(BoxLayout):
         if not city:
             self.weather_label.text = "Please enter a city!"
             return
-        url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={OPENWEATHER_API_KEY}&units=metric"
+        
+        # 使用https协议并添加超时参数
+        url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={OPENWEATHER_API_KEY}&units=metric"
         try:
-            response = requests.get(url)
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()  # 检查HTTP错误
             data = response.json()
             if data.get("cod") != 200:
                 self.weather_label.text = f"Error: {data.get('message', 'City not found')}"
@@ -41,6 +44,8 @@ class WeatherApp(BoxLayout):
             temp = data["main"]["temp"]
             desc = data["weather"][0]["description"].capitalize()
             self.weather_label.text = f"{city}: {desc}, {temp}℃"
+        except requests.exceptions.RequestException as e:
+            self.weather_label.text = f"Network Error: {str(e)}"
         except Exception as e:
             self.weather_label.text = f"Error: {str(e)}"
 
