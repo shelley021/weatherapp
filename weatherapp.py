@@ -1,3 +1,4 @@
+y
 import os
 import requests
 from dotenv import load_dotenv
@@ -60,3 +61,4 @@ class WeatherAppMain(App):
 
 if __name__ == "__main__":
     WeatherAppMain().run()
+```
