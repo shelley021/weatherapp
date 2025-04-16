@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
     - uses: actions/checkout@v3
@@ -22,7 +22,7 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+        sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev libsdl2-dev libsdl2-ttf-dev
 
     - name: Install Python dependencies
       run: |
@@ -56,10 +56,12 @@ android.api = 33
 android.minapi = 21
 android.ndk = 25b
 android.sdk = 33
-android.gradle_dependencies = 'com.android.tools.build:gradle:7.1.2'
+android.gradle_dependencies = 'com.android.tools.build:gradle:8.1.2'
 android.permissions = INTERNET
 fullscreen = 0
 p4a.branch = master
+android.allow_backup = false
+android.accept_sdk_license = true
 [buildozer]
 log_level = 2" > buildozer.spec
         buildozer -v android debug
