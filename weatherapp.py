@@ -8,7 +8,6 @@ from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 
-# 确保加载.env文件
 load_dotenv('.env')
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
 
@@ -29,30 +28,28 @@ class WeatherApp(BoxLayout):
         self.add_widget(self.weather_label)
 
     def get_weather(self, instance):
-        city = self.city_input.text.strip()
-        if not city:
-            self.weather_label.text = "Please enter a city!"
-            return
-        
-        if not OPENWEATHER_API_KEY:
-            self.weather_label.text = "API key not configured in .env file!"
-            return
-            
-        url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={OPENWEATHER_API_KEY}&units=metric"
         try:
+            city = self.city_input.text.strip()
+            if not city:
+                raise ValueError("Please enter a city!")
+            
+            if not OPENWEATHER_API_KEY:
+                raise ValueError("API key not configured in .env file!")
+                
+            url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={OPENWEATHER_API_KEY}&units=metric"
             response = requests.get(url, timeout=10)
             response.raise_for_status()
             data = response.json()
+            
             if data.get("cod") != 200:
-                self.weather_label.text = f"Error: {data.get('message', 'City not found')}"
-                return
+                raise ValueError(data.get('message', 'City not found'))
+                
             temp = data["main"]["temp"]
             desc = data["weather"][0]["description"].capitalize()
             humidity = data["main"]["humidity"]
             wind_speed = data["wind"]["speed"]
             self.weather_label.text = f"{city}: {desc}\nTemperature: {temp}℃\nHumidity: {humidity}%\nWind: {wind_speed} m/s"
-        except requests.exceptions.RequestException as e:
-            self.weather_label.text = f"Network Error: {str(e)}"
+            
         except Exception as e:
             self.weather_label.text = f"Error: {str(e)}"
 
