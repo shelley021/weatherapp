@@ -8,7 +8,8 @@ from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 
-load_dotenv()
+# 确保加载.env文件
+load_dotenv('.env')
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
 
 class WeatherApp(BoxLayout):
@@ -34,7 +35,7 @@ class WeatherApp(BoxLayout):
             return
         
         if not OPENWEATHER_API_KEY:
-            self.weather_label.text = "API key not configured!"
+            self.weather_label.text = "API key not configured in .env file!"
             return
             
         url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={OPENWEATHER_API_KEY}&units=metric"
