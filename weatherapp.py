@@ -46,7 +46,9 @@ class WeatherApp(BoxLayout):
                 return
             temp = data["main"]["temp"]
             desc = data["weather"][0]["description"].capitalize()
-            self.weather_label.text = f"{city}: {desc}, {temp}℃"
+            humidity = data["main"]["humidity"]
+            wind_speed = data["wind"]["speed"]
+            self.weather_label.text = f"{city}: {desc}\nTemperature: {temp}℃\nHumidity: {humidity}%\nWind: {wind_speed} m/s"
         except requests.exceptions.RequestException as e:
             self.weather_label.text = f"Network Error: {str(e)}"
         except Exception as e:
