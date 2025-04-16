@@ -48,7 +48,7 @@ package.domain = org.weatherapp
 source.dir = .
 source.include_exts = py,kv
 version = 0.1
-requirements = python3==3.10.13,kivy==2.3.1,requests,python-dotenv
+requirements = python3==3.10.13,kivy==2.3.1,requests,python-dotenv,openssl
 orientation = portrait
 osx.python_version = 3
 osx.kivy_version = 2.3.1
@@ -57,6 +57,8 @@ android.minapi = 21
 android.ndk = 25b
 android.sdk = 33
 android.gradle_dependencies = 'com.android.tools.build:gradle:7.1.2'
+android.permissions = INTERNET
+fullscreen = 0
 p4a.branch = master
 [buildozer]
 log_level = 2" > buildozer.spec
