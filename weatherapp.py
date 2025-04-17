@@ -6,6 +6,7 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.network.urlrequest import UrlRequest
 from urllib.parse import quote
+import certifi
 
 class WeatherApp(App):
     def build(self):
@@ -31,7 +32,7 @@ class WeatherApp(App):
                   on_success=self.update_ui, 
                   on_error=self.handle_error,
                   timeout=10,
-                  ca_file=None)
+                  ca_file=certifi.where())
 
     def update_ui(self, req, result):
         try:
