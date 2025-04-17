@@ -5,7 +5,7 @@ from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 import requests
-from kivy.clock import Clock
+from kivy.network.urlrequest import UrlRequest
 
 class WeatherApp(App):
     def build(self):
@@ -22,16 +22,22 @@ class WeatherApp(App):
 
     def get_weather(self, instance):
         city = self.city_input.text
-        try:
-            response = requests.get(f'http://wthrcdn.etouch.cn/weather_mini?city={city}')
-            data = response.json()
-            if data['status'] == 1000:
-                weather = data['data']['forecast'][0]
-                self.weather_label.text = f"{city}天气:\n{weather['type']}\n温度: {weather['low'][2:]}~{weather['high'][2:]}"
-            else:
-                self.weather_label.text = "城市不存在或查询失败"
-        except Exception as e:
-            self.weather_label.text = f"网络错误: {str(e)}"
+        if not city.strip():
+            self.weather_label.text = "请输入城市名"
+            return
+            
+        url = f'http://wthrcdn.etouch.cn/weather_mini?city={city}'
+        UrlRequest(url, on_success=self.update_ui, on_error=self.handle_error)
+
+    def update_ui(self, req, result):
+        if result['status'] == 1000:
+            weather = result['data']['forecast'][0]
+            self.weather_label.text = f"{self.city_input.text}天气:\n{weather['type']}\n温度: {weather['low'][2:]}~{weather['high'][2:]}"
+        else:
+            self.weather_label.text = "城市不存在或查询失败"
+
+    def handle_error(self, req, error):
+        self.weather_label.text = f"网络错误: {str(error)}"
 
 if __name__ == '__main__':
     WeatherApp().run()
