@@ -31,16 +31,27 @@ jobs:
     - name: Initialize Buildozer
       run: |
         buildozer init
-        sed -i 's/title = My Application/title = WeatherApp/' buildozer.spec
-        sed -i 's/package.name = myapp/package.name = weatherapp/' buildozer.spec
-        sed -i 's/requirements = python3,kivy/requirements = python3,kivy==2.3.1,requests==2.25.1,pyopenssl,sdl2_ttf,openssl/' buildozer.spec
-        sed -i 's/#android.ndk_path =/android.ndk_path = ~\/.buildozer\/android\/platform\/android-ndk-r25c/' buildozer.spec
-        sed -i 's/#android.sdk_path =/android.sdk_path = ~\/.buildozer\/android\/platform\/android-sdk/' buildozer.spec
-        echo "android.api = 33" >> buildozer.spec
-        echo "android.minapi = 21" >> buildozer.spec
+        echo "[app]
+title = WeatherApp
+package.name = weatherapp
+package.domain = org.weatherapp
+source.dir = .
+source.include_exts = py,png,jpg,kv,atlas
+version = 0.1
+requirements = python3,kivy==2.3.1,requests==2.25.1,openssl,pyopenssl
+android.api = 33
+android.minapi = 21
+android.sdk = 26
+android.ndk = 25c
+android.ndk_path = $HOME/.buildozer/android/platform/android-ndk-r25c
+android.sdk_path = $HOME/.buildozer/android/platform/android-sdk
+orientation = portrait
+fullscreen = 0
+" > buildozer.spec
 
     - name: Build APK
       run: |
+        mkdir -p ~/.buildozer/android/platform
         buildozer android clean
         buildozer android debug deploy
 
