@@ -7,6 +7,7 @@ from kivy.uix.button import Button
 from kivy.network.urlrequest import UrlRequest
 from urllib.parse import quote
 import certifi
+import json
 
 class WeatherApp(App):
     def build(self):
@@ -32,12 +33,14 @@ class WeatherApp(App):
                   on_success=self.update_ui, 
                   on_error=self.handle_error,
                   timeout=10,
-                  ca_file=certifi.where())
+                  ca_file=certifi.where(),
+                  req_headers={'Content-Type': 'application/json'})
 
     def update_ui(self, req, result):
         try:
-            if result.get('status') == 1000:
-                weather = result['data']['forecast'][0]
+            data = json.loads(result)
+            if data.get('status') == 1000:
+                weather = data['data']['forecast'][0]
                 self.weather_label.text = f"{self.city_input.text}天气:\n{weather['type']}\n温度: {weather['low'][2:]}~{weather['high'][2:]}"
             else:
                 self.weather_label.text = "城市不存在或查询失败"
