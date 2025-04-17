@@ -4,8 +4,7 @@ name: WeatherApp CI
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -22,54 +21,25 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev
-        wget https://dl.google.com/android/repository/android-ndk-r25b-linux.zip
-        unzip android-ndk-r25b-linux.zip -d /usr/local/lib/android/sdk/ndk
-        echo "export ANDROID_NDK_HOME=/usr/local/lib/android/sdk/ndk/android-ndk-r25b" >> $GITHUB_ENV
+        sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
 
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install cython==0.29.36
-        pip install kivy==2.3.1 requests python-dotenv buildozer
+        pip install buildozer kivy==2.3.1 requests==2.25.1 sdl2_ttf
 
-    - name: Run WeatherApp test
-      env:
-        OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+    - name: Initialize Buildozer
       run: |
-        python weatherapp.py &
-        sleep 5
-        pkill python
+        buildozer init
+        sed -i 's/title = My Application/title = WeatherApp/' buildozer.spec
+        sed -i 's/package.name = myapp/package.name = weatherapp/' buildozer.spec
+        sed -i 's/requirements = python3,kivy/requirements = python3,kivy==2.3.1,requests==2.25.1,pyopenssl,sdl2_ttf/' buildozer.spec
+        sed -i 's/#android.ndk_path =/android.ndk_path = ~\/.buildozer\/android\/platform\/android-ndk-r25c/' buildozer.spec
 
     - name: Build APK
       run: |
-        echo "[app]
-title = WeatherApp
-package.name = weatherapp
-package.domain = org.weatherapp
-source.dir = .
-source.include_exts = py,kv,env
-version = 0.1
-requirements = python3==3.10.13,kivy==2.3.1,requests,python-dotenv,openssl
-orientation = portrait
-osx.python_version = 3
-osx.kivy_version = 2.3.1
-android.api = 33
-android.minapi = 21
-android.ndk = 25b
-android.sdk = 33
-android.gradle_dependencies = 'com.android.tools.build:gradle:8.1.2'
-android.permissions = INTERNET
-fullscreen = 0
-p4a.branch = master
-android.arch = arm64-v8a
-android.allow_backup = false
-android.accept_sdk_license = true
-android.debuggable = true
-
-[buildozer]
-log_level = 2" > buildozer.spec
-        buildozer -v android debug
+        buildozer android clean
+        buildozer android debug deploy
 
     - name: Upload APK
       uses: actions/upload-artifact@v3
