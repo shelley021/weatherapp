@@ -1,0 +1,18 @@
+改动总结：主要改动：
+1. 修复了 `weatherapp.py` 中按钮定义缺少右括号的语法错误
+2. 移除了 `debug.yml` 中无法安装的 `sdl2_ttf` 依赖
+3. 在 `buildozer.spec` 中添加了 `p4a.branch = master` 配置
+4. 确保所有依赖版本兼容 Python 3.10
+
+原因：原配置因依赖问题和语法错误导致构建失败，修正后应能正常构建 APK。
+
+weatherapp.py 改动：
+行 25 起：
+```
+        )
+```
+debug.yml 改动：
+行 69 起：
+```
+p4a.branch = master
+```

@@ -1,0 +1,107 @@
+改动总结：主要改动：
+1. 移除了不存在的 `sdl2_ttf` 依赖，Kivy 2.3.1 已内置字体支持
+2. 优化了 GUI 布局和错误处理
+3. 添加了 Android SDK 许可自动接受
+4. 增加了构建超时时间和日志输出
+5. 简化了 requirements 配置
+
+原因：原配置中 `sdl2_ttf` 包已不存在导致安装失败，且缺少必要的 Android 构建环境配置。优化后更稳定可靠。
+
+weatherapp.py 改动：
+行 18 起：
+```
+        self.layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
+        self.city_input = TextInput(
+            hint_text='输入城市名',
+            size_hint=(1, 0.2),
+            multiline=False
+        )
+        self.submit = Button(
+            text='查询天气',
+            size_hint=(1, 0.2),
+            background_normal='',
+            background_color=(0.2, 0.6, 1, 1)
+        )
+        self.weather_label = Label(
+            text='天气信息将显示在这里',
+            size_hint=(1, 0.6),
+            halign='center',
+            valign='middle'
+        )
+```
+行 38 起：
+```
+        try:
+            url = f'https://wthrcdn.etouch.cn/weather_mini?city={quote(city)}'
+            UrlRequest(
+                url, 
+                on_success=self.update_ui, 
+                on_error=self.handle_error,
+                timeout=15,
+                ca_file=certifi.where(),
+                req_headers={
+                    'User-Agent': 'Mozilla/5.0',
+                    'Content-Type': 'application/json'
+                }
+            )
+            self.weather_label.text = "查询中..."
+        except Exception as e:
+            self.weather_label.text = f"请求错误: {str(e)}"
+```
+行 45 起：
+```
+                self.weather_label.text = (
+                    f"{self.city_input.text}天气:\n"
+                    f"{weather['type']}\n"
+                    f"温度: {weather['low'][2:]}~{weather['high'][2:]}\n"
+                    f"风向: {weather['fengxiang']}"
+                )
+```
+debug.yml 改动：
+行 1 起：
+```
+l
+```
+行 11 起：
+```
+    timeout-minutes: 30
+```
+行 34 起：
+```
+        pip install buildozer==1.5.0 kivy==2.3.1 requests==2.25.1 cython==0.29.36 certifi
+```
+行 36 起：
+```
+    - name: Install Android NDK/SDK
+```
+行 40 起：
+```
+        mkdir -p ~/.android
+        touch ~/.android/repositories.cfg
+        yes | sdkmanager --licenses
+```
+行 62 起：
+```
+title = WeatherApp
+package.name = weatherapp
+package.domain = org.weatherapp
+source.dir = .
+source.include_exts = py,png,jpg,kv,atlas
+version = 0.1
+requirements = python3,kivy==2.3.1,requests==2.25.1,certifi
+android.permissions = INTERNET
+android.api = 33
+android.minapi = 21
+android.sdk = 26
+android.ndk = 25c
+android.ndk_path = /opt/android-ndk-r25c
+android.accept_sdk_license = True
+orientation = portrait
+fullscreen = 0
+log_level = 2
+" > buildozer.spec
+```
+行 67 起：
+```
+        buildozer -v android debug deploy 2>&1 | tee build.log
+```

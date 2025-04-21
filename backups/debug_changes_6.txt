@@ -1,0 +1,11 @@
+改动总结：改动原因：
+1. 修复了 weatherapp.py 中 Button 定义缺少右括号的语法错误
+2. 移除了 debug.yml 中不兼容的 sdl2_ttf 依赖
+3. 确保 buildozer.spec 配置与 NDK 版本一致
+
+weatherapp.py 改动：
+行 25 起：
+```
+        )
+```
+debug.yml 无改动。

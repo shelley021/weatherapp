@@ -36,15 +36,7 @@ jobs:
       run: |
         wget -q https://dl.google.com/android/repository/android-ndk-r25c-linux.zip
         unzip -q android-ndk-r25c-linux.zip -d /opt
-        ls -la /opt/android-ndk-r25c || echo "NDK installation failed"
         echo "ndk_path=/opt/android-ndk-r25c" >> $GITHUB_ENV
-
-    - name: Install Android SDK
-      run: |
-        wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-        unzip -q commandlinetools-linux-9477386_latest Avec -d /opt/android-sdk
-        yes | /opt/android-sdk/cmdline-tools/bin/sdkmanager --sdk_root=/opt/android-sdk "platforms;android-33" "build-tools;33.0.0"
-        echo "ANDROID_HOME=/opt/android-sdk" >> $GITHUB_ENV
 
     - name: Initialize Buildozer
       run: |
@@ -63,18 +55,15 @@ jobs:
         android.sdk = 26
         android.ndk = 25c
         android.ndk_path = /opt/android-ndk-r25c
-        android.sdk_path = /opt/android-sdk
-        android.accept_sdk_license = True
         orientation = portrait
         fullscreen = 0
         log_level = 2
-        p4a.branch = master
         " > buildozer.spec
 
     - name: Build APK
       run: |
-        buildozer android clean 2>&1 | tee -a build.log
-        buildozer -v android debug deploy 2>&1 | tee -a build.log || echo "Build failed, check build.log for details" >> build.log
+        buildozer android clean
+        buildozer -v android debug deploy || echo "Build failed, check build.log for details"
 
     - name: Save Build Log
       if: always()

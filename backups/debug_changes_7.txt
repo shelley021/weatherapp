@@ -1,0 +1,20 @@
+改动总结：改动原因：
+1. 移除了 `sdl2_ttf` 依赖（Kivy 2.3.1 已内置）
+2. 完善了 buildozer.spec 配置（添加 gradle_download，修正 SDK/NDK 版本）
+3. 添加了 Android SDK 组件安装步骤
+4. 保持 weatherapp.py 原有功能，错误处理已完善
+
+weatherapp.py 无改动。
+debug.yml 改动：
+行 45 起：
+```
+        sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
+```
+行 61 起：
+```
+android.sdk = 33
+```
+行 67 起：
+```
+android.gradle_download = True
+```
