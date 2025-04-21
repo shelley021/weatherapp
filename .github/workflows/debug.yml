@@ -42,6 +42,7 @@ jobs:
         mkdir -p ~/.android
         touch ~/.android/repositories.cfg
         yes | sdkmanager --licenses
+        sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
 
     - name: Initialize Buildozer
       run: |
@@ -57,13 +58,14 @@ requirements = python3,kivy==2.3.1,requests==2.25.1,certifi
 android.permissions = INTERNET
 android.api = 33
 android.minapi = 21
-android.sdk = 26
+android.sdk = 33
 android.ndk = 25c
 android.ndk_path = /opt/android-ndk-r25c
 android.accept_sdk_license = True
 orientation = portrait
 fullscreen = 0
 log_level = 2
+android.gradle_download = True
 " > buildozer.spec
 
     - name: Build APK
