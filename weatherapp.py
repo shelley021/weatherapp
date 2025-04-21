@@ -22,6 +22,7 @@ class WeatherApp(App):
             size_hint=(1, 0.2),
             background_normal='',
             background_color=(0.2, 0.6, 1, 1)
+        )
         self.weather_label = Label(
             text='天气信息将显示在这里',
             size_hint=(1, 0.6),
