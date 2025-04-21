@@ -66,6 +66,7 @@ orientation = portrait
 fullscreen = 0
 log_level = 2
 android.gradle_download = True
+p4a.branch = master
 " > buildozer.spec
 
     - name: Build APK
