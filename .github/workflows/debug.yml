@@ -94,3 +94,5 @@ jobs:
       with:
         name: weatherapp-apk
         path: bin/*.apk
+
+        #v1
