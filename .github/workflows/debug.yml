@@ -1,6 +1,7 @@
 name: Debug Build
 true:
 - push
+- pull_request
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -10,29 +11,28 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
-    - name: Install Android SDK
-      uses: android-actions/setup-android@v3
+    - name: Set up JDK
+      uses: actions/setup-java@v3
       with:
-        cmdline-tools-version: latest
-        build-tools-version: 34.0.0
-        platform-version: '34'
-        ndk-version: 25.2.9519653
+        distribution: zulu
+        java-version: '11'
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v2
+      with:
+        ndk-version: 25b
         cmake-version: 3.22.1
-    - name: Install Kivy dependencies
-      run: 'sudo apt-get update
+    - name: Install Buildozer
+      run: 'pip install --upgrade pip setuptools virtualenv
 
-        sudo apt-get install -y python3-pip python3-dev ffmpeg libsdl2-dev libsdl2-image-dev
-        libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev
-        libavcodec-dev zlib1g-dev
+        pip install buildozer
 
         '
-    - name: Install Python dependencies
-      run: 'pip install --upgrade pip
+    - name: Build APK
+      run: 'export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
 
-        pip install kivy buildozer'
-'on':
-  push:
-    branches:
-    - main
-  pull_request: {}
-  workflow_dispatch: {}
+        buildozer -v android debug
+
+        '
+      env:
+        ANDROID_HOME: /usr/local/lib/android/sdk
+        ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
