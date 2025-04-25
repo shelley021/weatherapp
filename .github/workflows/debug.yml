@@ -4,23 +4,30 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        distribution: zulu
-        java-version: '17'
-    - name: Set up Android SDK
-      uses: android-actions/setup-android@v3
-    - name: Set up Python
+    - name: Set up Python 3.10
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
     - name: Install dependencies
-      run: 'python -m pip install --upgrade pip
+      run: "python -m pip install --upgrade pip\n# \u68C0\u67E5\u662F\u5426\u5B58\u5728\
+        \ requirements.txt\uFF0C\u4E0D\u5B58\u5728\u5219\u5B89\u88C5\u57FA\u7840\u4F9D\
+        \u8D56\nif [ -f \"requirements.txt\" ]; then\n  pip install -r requirements.txt\n\
+        else\n  pip install kivy buildozer\nfi\n"
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v3
+    - name: Build with Buildozer
+      run: 'buildozer android debug
 
-        pip install -r requirements.txt
-
-        pip install buildozer'
+        '
+      env:
+        P4A_RELEASE_KEYSTORE: ${{ secrets.P4A_RELEASE_KEYSTORE }}
+        P4A_RELEASE_KEYALIAS: ${{ secrets.P4A_RELEASE_KEYALIAS }}
+        P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}
+        P4A_RELEASE_KEYALIAS_PASSWD: ${{ secrets.P4A_RELEASE_KEYALIAS_PASSWD }}
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
     - name: Accept Android licenses
       run: 'yes | sdkmanager --licenses || true
 
