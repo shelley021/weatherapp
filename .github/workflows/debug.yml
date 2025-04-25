@@ -1,6 +1,7 @@
 name: Debug Build
 true:
 - push
+- pull_request
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -10,20 +11,31 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
-    - name: Install Android SDK
-      uses: android-actions/setup-android@v2
-      with:
-        cmdline-tools-version: latest
-        build-tools-version: 34.0.0
-        platform-version: '34'
-        ndk-version: 25.2.9519653
-        cmake-version: 3.22.1
     - name: Install Kivy dependencies
-      run: "sudo apt-get update\nsudo apt-get install -y python3-pip build-essential\
-        \ git python3-dev ffmpeg \\\n  libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev\
-        \ libsdl2-ttf-dev \\\n  libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev\
-        \ zlib1g-dev\n"
-    - name: Install Python dependencies
-      run: 'python -m pip install --upgrade pip
+      run: "sudo apt-get update\nsudo apt-get install -y \\\n  python3-pip \\\n  build-essential\
+        \ \\\n  git \\\n  python3 \\\n  python3-dev \\\n  ffmpeg \\\n  libsdl2-dev\
+        \ \\\n  libsdl2-image-dev \\\n  libsdl2-mixer-dev \\\n  libsdl2-ttf-dev \\\
+        \n  libportmidi-dev \\\n  libswscale-dev \\\n  libavformat-dev \\\n  libavcodec-dev\
+        \ \\\n  zlib1g-dev\n"
+    - name: Install Kivy
+      run: pip install kivy[base] kivy_examples buildozer
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: zulu
+        java-version: '11'
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v3
+      with:
+        accept-android-licenses: true
+        additional-sdk-components: platform-tools,build-tools;34.0.0,platforms;android-34
+    - name: Build with Buildozer
+      run: 'buildozer init
 
-        pip install kivy buildozer Cython==0.29.19'
+        buildozer -v android debug
+
+        '
+      env:
+        PATH: ${{ env.PATH }}:$ANDROID_HOME/cmdline-tools/latest/bin
+        ANDROID_HOME: /usr/local/lib/android/sdk
+        ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
