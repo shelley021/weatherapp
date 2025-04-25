@@ -4,43 +4,35 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v5
+    - uses: actions/checkout@v4
+    - uses: actions/checkout@v2
+      with:
+        path: src
+    - name: Set up Python
+      uses: actions/setup-python@v2
       with:
         python-version: '3.10'
     - name: Install dependencies
-      run: "python -m pip install --upgrade pip\n# \u68C0\u67E5\u662F\u5426\u5B58\u5728\
-        \ requirements.txt\uFF0C\u4E0D\u5B58\u5728\u5219\u5B89\u88C5\u57FA\u7840\u4F9D\
-        \u8D56\nif [ -f \"requirements.txt\" ]; then\n  pip install -r requirements.txt\n\
-        else\n  pip install kivy buildozer\nfi\n"
-    - name: Set up Android SDK
-      uses: android-actions/setup-android@v3
-    - name: Build with Buildozer
-      run: 'buildozer android debug
+      run: 'pip install --upgrade pip
+
+        pip install buildozer cython==0.29.19
 
         '
+    - name: Generate buildozer.spec
+      working-directory: ./src
+      run: "if [ ! -f buildozer.spec ]; then\n  buildozer init\nfi\n"
+    - name: Build APK
+      working-directory: ./src
+      run: buildozer android debug
       env:
         P4A_RELEASE_KEYSTORE: ${{ secrets.P4A_RELEASE_KEYSTORE }}
         P4A_RELEASE_KEYALIAS: ${{ secrets.P4A_RELEASE_KEYALIAS }}
         P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}
         P4A_RELEASE_KEYALIAS_PASSWD: ${{ secrets.P4A_RELEASE_KEYALIAS_PASSWD }}
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
     - name: Accept Android licenses
       run: 'yes | sdkmanager --licenses || true
 
         sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"'
-    - name: Build APK
-      run: buildozer -v android debug deploy 2>&1 | tee build.log || { echo "Build
-        failed, check build.log for details"; exit 1; }
-      env:
-        OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
-        P4A_RELEASE_KEYSTORE: ${{ secrets.P4A_RELEASE_KEYSTORE }}
-        P4A_RELEASE_KEYALIAS: ${{ secrets.P4A_RELEASE_KEYALIAS }}
-        P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}
-        P4A_RELEASE_KEYALIAS_PASSWD: ${{ secrets.P4A_RELEASE_KEYALIAS_PASSWD }}
 'on':
   push:
     branches:
