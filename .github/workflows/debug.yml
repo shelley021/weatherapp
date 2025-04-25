@@ -1,7 +1,10 @@
 name: Debug Android Build
-true:
-- push
-- pull_request
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch: {}
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,174 +15,31 @@ jobs:
       with:
         python-version: '3.10'
     - name: Install dependencies
-      run: 'pip install -r requirements.txt
-
+      run: |
+        pip install -r requirements.txt
         sudo apt-get update
-
         sudo apt-get install -y openjdk-11-jdk
-
-        '
     - name: Install Android SDK
-      run: 'yes | sudo apt-get install -y openjdk-11-jdk
-
+      run: |
+        yes | sudo apt-get install -y openjdk-11-jdk
         wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-
         unzip commandlinetools-linux-*.zip -d $ANDROID_HOME/cmdline-tools
-
         mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-
-        echo ''export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin'' >> $GITHUB_ENV'
-    - name: Install Android SDK
-      run: 'yes | sudo apt-get install -y openjdk-11-jdk
-
-        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-
-        unzip commandlinetools-linux-*.zip -d $ANDROID_HOME/cmdline-tools
-
-        mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-
-        echo ''export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin'' >> $GITHUB_ENV'
-    - name: Install Android SDK
-      run: 'yes | sudo apt-get install -y openjdk-11-jdk
-
-        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-
-        unzip commandlinetools-linux-*.zip -d $ANDROID_HOME/cmdline-tools
-
-        mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-
-        echo ''export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin'' >> $GITHUB_ENV'
-    - name: Install Android SDK
-      run: 'yes | sudo apt-get install -y openjdk-11-jdk
-
-        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-
-        unzip commandlinetools-linux-*.zip -d $ANDROID_HOME/cmdline-tools
-
-        mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-
-        echo ''export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin'' >> $GITHUB_ENV'
-    - name: Install Android SDK
-      run: 'yes | sudo apt-get install -y openjdk-11-jdk
-
-        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-
-        unzip commandlinetools-linux-*.zip -d $ANDROID_HOME/cmdline-tools
-
-        mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-
-        echo ''export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin'' >> $GITHUB_ENV'
-    - name: Install Android SDK
-      run: 'yes | sudo apt-get install -y openjdk-11-jdk
-
-        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-
-        unzip commandlinetools-linux-*.zip -d $ANDROID_HOME/cmdline-tools
-
-        mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-
-        echo ''export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin'' >> $GITHUB_ENV'
-    - name: Install Android SDK
-      run: 'yes | sudo apt-get install -y openjdk-11-jdk
-
-        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-
-        unzip commandlinetools-linux-*.zip -d $ANDROID_HOME/cmdline-tools
-
-        mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-
-        echo ''export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin'' >> $GITHUB_ENV'
-    - name: Install Android SDK
-      run: 'yes | sudo apt-get install -y openjdk-11-jdk
-
-        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-
-        unzip commandlinetools-linux-*.zip -d $ANDROID_HOME/cmdline-tools
-
-        mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-
-        echo ''export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin'' >> $GITHUB_ENV'
-    - name: Install Android SDK
-      run: 'yes | sudo apt-get install -y openjdk-11-jdk
-
-        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-
-        unzip commandlinetools-linux-*.zip -d $ANDROID_HOME/cmdline-tools
-
-        mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-
-        echo ''export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin'' >> $GITHUB_ENV'
-    - name: Install Android SDK
-      run: 'yes | sudo apt-get install -y openjdk-11-jdk
-
-        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-
-        unzip commandlinetools-linux-*.zip -d $ANDROID_HOME/cmdline-tools
-
-        mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-
-        echo ''export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin'' >> $GITHUB_ENV'
-    - name: Install Android SDK
-      run: 'yes | sudo apt-get install -y openjdk-11-jdk
-
-        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-
-        unzip commandlinetools-linux-*.zip -d $ANDROID_HOME/cmdline-tools
-
-        mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-
-        echo ''export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin'' >> $GITHUB_ENV'
-    - name: Install Android SDK
-      run: 'yes | sudo apt-get install -y openjdk-11-jdk
-
-        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-
-        unzip commandlinetools-linux-*.zip -d $ANDROID_HOME/cmdline-tools
-
-        mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-
-        echo ''export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin'' >> $GITHUB_ENV'
-    - name: Install Android SDK
-      run: 'yes | sudo apt-get install -y openjdk-11-jdk
-
-        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-
-        unzip commandlinetools-linux-*.zip -d $ANDROID_HOME/cmdline-tools
-
-        mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-
-        echo ''export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin'' >> $GITHUB_ENV'
-    - name: Install Android SDK
-      run: 'yes | sudo apt-get install -y openjdk-11-jdk
-
-        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-
-        unzip commandlinetools-linux-*.zip -d $ANDROID_HOME/cmdline-tools
-
-        mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-
-        echo ''export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin'' >> $GITHUB_ENV'
+        echo 'export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin' >> $GITHUB_ENV
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
       with:
         ndk-version: 25c
         sdk-version: commandlinetools-latest
     - name: Accept licenses
-      run: 'yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
-
-        '
+      run: |
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
     - name: Build APK
-      run: 'buildozer android debug 2>&1 | tee build.log
-
-        '
+      run: |
+        buildozer android debug 2>&1 | tee build.log
     - name: Upload build log
       uses: actions/upload-artifact@v4
       if: always()
       with:
         name: build-log
         path: build.log
-'on':
-  push:
-    branches:
-    - main
-  workflow_dispatch: {}
