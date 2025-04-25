@@ -1,4 +1,4 @@
-name: Debug Build
+name: Debug Android Build
 true:
 - push
 jobs:
@@ -15,19 +15,18 @@ jobs:
       with:
         ndk-version: 25c
         cmake-version: 3.22.1
-    - name: Configure Android SDK
+    - name: Accept Android Licenses
       run: 'yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
 
-        $ANDROID_HOME/tools/bin/sdkmanager "platform-tools" "platforms;android-33"
-        "build-tools;33.0.0"
-
-        echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
+        '
+    - name: Install Build Tools
+      run: '$ANDROID_HOME/tools/bin/sdkmanager "build-tools;34.0.0" "platforms;android-34"
 
         '
     - name: Build with Kivy
       run: 'pip install -r requirements.txt
 
-        python setup.py build
+        python build.py android debug
 
         '
     - name: Upload build log
@@ -37,7 +36,4 @@ jobs:
         name: build-log
         path: 'build.log
 
-          **/*.log
-
-          '
-        if-no-files-found: ignore
+          **/*.log'
