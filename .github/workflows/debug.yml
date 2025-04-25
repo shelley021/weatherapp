@@ -37,3 +37,9 @@ jobs:
       run: 'export ANDROID_HOME=$ANDROID_SDK_ROOT
 
         ./gradlew assembleDebug'
+'on':
+  push:
+    branches:
+    - main
+  pull_request: {}
+  workflow_dispatch: {}
