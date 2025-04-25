@@ -1,6 +1,7 @@
 name: Debug Build
 true:
 - push
+- pull_request
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -26,7 +27,7 @@ jobs:
     - name: Build with Python
       run: 'pip install -r requirements.txt
 
-        python build.py 2>&1 | tee build.log
+        python setup.py build
 
         '
     - name: Upload build log
@@ -34,4 +35,6 @@ jobs:
       if: always()
       with:
         name: build-log
-        path: build.log
+        path: 'build.log
+
+          **/*.log'
