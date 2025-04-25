@@ -22,6 +22,8 @@ jobs:
         sudo apt-get install -y openjdk-11-jdk
 
         '
+    - name: Install Buildozer
+      run: pip install buildozer
     - name: Install Android SDK
       run: 'yes | sudo apt-get install -y openjdk-11-jdk
 
