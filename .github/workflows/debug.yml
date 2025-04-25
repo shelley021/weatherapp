@@ -19,6 +19,8 @@ jobs:
         pip install buildozer
 
         '
+    - name: Install Buildozer
+      run: pip install buildozer
     - name: Set up JDK
       uses: actions/setup-java@v3
       with:
