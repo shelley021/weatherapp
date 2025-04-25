@@ -5,34 +5,29 @@ jobs:
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v4
-    - uses: actions/checkout@v2
-      with:
-        path: src
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: '3.10'
     - name: Install dependencies
-      run: 'pip install --upgrade pip
+      run: 'python -m pip install --upgrade pip
 
-        pip install buildozer cython==0.29.19
+        pip install -r requirements.txt
 
-        '
-    - name: Generate buildozer.spec
-      working-directory: ./src
-      run: "if [ ! -f buildozer.spec ]; then\n  buildozer init\nfi\n"
-    - name: Build APK
-      working-directory: ./src
-      run: buildozer android debug
-      env:
-        P4A_RELEASE_KEYSTORE: ${{ secrets.P4A_RELEASE_KEYSTORE }}
-        P4A_RELEASE_KEYALIAS: ${{ secrets.P4A_RELEASE_KEYALIAS }}
-        P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}
-        P4A_RELEASE_KEYALIAS_PASSWD: ${{ secrets.P4A_RELEASE_KEYALIAS_PASSWD }}
+        pip install buildozer'
     - name: Accept Android licenses
       run: 'yes | sdkmanager --licenses || true
 
         sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"'
+    - name: Build APK
+      run: buildozer -v android debug deploy 2>&1 | tee build.log || { echo "Build
+        failed, check build.log for details"; exit 1; }
+      env:
+        OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+        P4A_RELEASE_KEYSTORE: ${{ secrets.P4A_RELEASE_KEYSTORE }}
+        P4A_RELEASE_KEYALIAS: ${{ secrets.P4A_RELEASE_KEYALIAS }}
+        P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}
+        P4A_RELEASE_KEYALIAS_PASSWD: ${{ secrets.P4A_RELEASE_KEYALIAS_PASSWD }}
 'on':
   push:
     branches:
