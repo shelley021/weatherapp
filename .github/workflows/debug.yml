@@ -1,6 +1,7 @@
-name: Debug Build
+name: Debug Android Build
 true:
 - push
+- pull_request
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -10,24 +11,30 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
-    - name: Install Android SDK
+    - name: Install dependencies
+      run: 'pip install -r requirements.txt
+
+        sudo apt-get update
+
+        sudo apt-get install -y openjdk-11-jdk
+
+        '
+    - name: Setup Android SDK
       uses: android-actions/setup-android@v3
       with:
         ndk-version: 25c
-        cmake-version: 3.22.1
-    - name: Accept Android licenses
-      run: 'yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
+        sdk-version: commandlinetools-latest
+    - name: Accept licenses
+      run: 'yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
 
         '
-    - name: Build with debug
-      run: 'echo "Build started" > build.log
-
-        python -m build 2>&1 | tee -a build.log
+    - name: Build APK
+      run: 'buildozer android debug 2>&1 | tee build.log
 
         '
     - name: Upload build log
       uses: actions/upload-artifact@v4
+      if: always()
       with:
         name: build-log
         path: build.log
-        if-no-files-found: error
