@@ -23,10 +23,10 @@ jobs:
         sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
 
         '
-    - name: Build with Kivy
+    - name: Build with Python
       run: 'pip install -r requirements.txt
 
-        python setup.py apk
+        python build.py 2>&1 | tee build.log
 
         '
     - name: Upload build log
@@ -34,9 +34,4 @@ jobs:
       if: always()
       with:
         name: build-log
-        path: 'build.log
-
-          *.log
-
-          '
-        if-no-files-found: error
+        path: build.log
