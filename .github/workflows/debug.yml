@@ -1,7 +1,6 @@
 name: Debug Build
 true:
 - push
-- pull_request
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,18 +15,14 @@ jobs:
       with:
         ndk-version: 25c
         cmake-version: 3.22.1
-    - name: Configure Android SDK
-      run: 'echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
-
-        yes | sdkmanager --licenses
-
-        sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
+    - name: Accept licenses
+      run: 'yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
 
         '
-    - name: Build with Python
-      run: 'pip install -r requirements.txt
+    - name: Build with debug
+      run: 'export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
 
-        python setup.py build
+        buildozer android debug > build.log 2>&1
 
         '
     - name: Upload build log
@@ -35,6 +30,4 @@ jobs:
       if: always()
       with:
         name: build-log
-        path: 'build.log
-
-          **/*.log'
+        path: build.log
