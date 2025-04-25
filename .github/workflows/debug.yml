@@ -1,4 +1,4 @@
-name: Debug Build
+name: Debug Android Build
 true:
 - push
 jobs:
@@ -15,23 +15,30 @@ jobs:
       with:
         ndk-version: 25c
         cmake-version: 3.22.1
-    - name: Accept licenses
-      run: 'yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
+    - name: Configure Android SDK
+      run: 'echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
+
+        echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
+
+        echo "$ANDROID_HOME/emulator" >> $GITHUB_PATH
+
+        yes | sdkmanager --licenses
 
         '
-    - name: Build with debug
-      run: 'echo "Build started" > build.log
+    - name: Build with Kivy
+      run: 'pip install -r requirements.txt
 
-        python -m pip install --upgrade pip
-
-        pip install -r requirements.txt
-
-        python setup.py build 2>&1 | tee -a build.log
+        python -m buildozer android debug
 
         '
     - name: Upload build log
       uses: actions/upload-artifact@v4
+      if: always()
       with:
         name: build-log
-        path: build.log
+        path: 'buildozer.spec
+
+          .buildozer/**/*.log
+
+          '
         if-no-files-found: error
