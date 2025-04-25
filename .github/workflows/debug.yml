@@ -4,7 +4,26 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
-    - uses: actions/checkout@v4
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: zulu
+        java-version: '11'
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v3
+    - name: Accept licenses
+      run: 'yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
+
+        '
+    - name: Install Android packages
+      run: '$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-33"
+        "build-tools;33.0.0"
+
+        '
+    - name: Build with Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.13'
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
@@ -15,16 +34,6 @@ jobs:
         pip install -r requirements.txt
 
         pip install buildozer'
-    - name: Install Android SDK
-      run: 'yes | sudo apt-get install -y openjdk-11-jdk
-
-        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-
-        unzip commandlinetools-linux-*.zip -d $ANDROID_HOME/cmdline-tools
-
-        mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-
-        echo ''export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin'' >> $GITHUB_ENV'
     - name: Accept Android licenses
       run: 'yes | sdkmanager --licenses || true
 
