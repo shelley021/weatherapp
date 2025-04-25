@@ -16,18 +16,17 @@ jobs:
         ndk-version: 25c
         cmake-version: 3.22.1
     - name: Configure Android SDK
-      run: 'yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
+      run: 'echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
 
-        $ANDROID_HOME/tools/bin/sdkmanager "platform-tools" "platforms;android-33"
-        "build-tools;33.0.0"
+        yes | sdkmanager --licenses
 
-        echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
+        sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"
 
         '
-    - name: Build with Python
+    - name: Build with Kivy
       run: 'pip install -r requirements.txt
 
-        python setup.py build
+        python setup.py apk
 
         '
     - name: Upload build log
@@ -37,7 +36,7 @@ jobs:
         name: build-log
         path: 'build.log
 
-          **/*.log
+          *.log
 
           '
         if-no-files-found: error
