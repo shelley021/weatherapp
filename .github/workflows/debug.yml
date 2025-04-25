@@ -2,33 +2,32 @@ name: Debug Android Build
 true:
 - push
 jobs:
-  build:
+  debug-android:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v4
+    - name: Set up JDK
+      uses: actions/setup-java@v3
       with:
-        python-version: '3.10'
+        distribution: zulu
+        java-version: '11'
     - name: Install Android SDK
       uses: android-actions/setup-android@v3
       with:
         ndk-version: 25c
         cmake-version: 3.22.1
-    - name: Configure Android SDK
-      run: 'echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
-
-        echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
-
-        echo "$ANDROID_HOME/emulator" >> $GITHUB_PATH
-
-        yes | sdkmanager --licenses
+    - name: Accept Android licenses
+      run: 'yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
 
         '
-    - name: Build with Kivy
-      run: 'pip install -r requirements.txt
+    - name: Build with debug info
+      run: 'echo "ANDROID_HOME: $ANDROID_HOME"
 
-        python -m buildozer android debug
+        echo "PATH: $PATH"
+
+        $ANDROID_HOME/tools/bin/sdkmanager --list
+
+        buildozer android debug 2>&1 | tee build.log
 
         '
     - name: Upload build log
@@ -36,9 +35,4 @@ jobs:
       if: always()
       with:
         name: build-log
-        path: 'buildozer.spec
-
-          .buildozer/**/*.log
-
-          '
-        if-no-files-found: error
+        path: build.log
