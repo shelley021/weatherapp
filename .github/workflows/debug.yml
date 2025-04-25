@@ -15,14 +15,19 @@ jobs:
       with:
         ndk-version: 25c
         cmake-version: 3.22.1
-    - name: Accept licenses
+    - name: Configure Android SDK
       run: 'yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
 
-        '
-    - name: Build with debug
-      run: 'export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
+        $ANDROID_HOME/tools/bin/sdkmanager "platform-tools" "platforms;android-33"
+        "build-tools;33.0.0"
 
-        buildozer android debug > build.log 2>&1
+        echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
+
+        '
+    - name: Build with Kivy
+      run: 'pip install -r requirements.txt
+
+        python setup.py build
 
         '
     - name: Upload build log
@@ -30,4 +35,9 @@ jobs:
       if: always()
       with:
         name: build-log
-        path: build.log
+        path: 'build.log
+
+          **/*.log
+
+          '
+        if-no-files-found: ignore
