@@ -1,38 +1,39 @@
-name: Debug Android Build
+name: Debug Build
 true:
 - push
+- pull_request
 jobs:
-  debug-android:
+  build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK
       uses: actions/setup-java@v3
       with:
+        distribution: zulu
         java-version: '11'
-        distribution: temurin
     - name: Install Android SDK
       uses: android-actions/setup-android@v3
       with:
         ndk-version: 25c
         cmake-version: 3.22.1
-    - name: Accept licenses
+    - name: Accept Android licenses
       run: 'yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
 
         '
-    - name: Build with debug info
-      run: 'echo "ANDROID_HOME: $ANDROID_HOME"
+    - name: Build with Python
+      run: 'python -m pip install --upgrade pip
 
-        echo "PATH: $PATH"
+        pip install -r requirements.txt
 
-        $ANDROID_HOME/tools/bin/sdkmanager --list
+        python setup.py build
 
         '
-    - name: Upload logs
+    - name: Upload build log
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: debug-logs
-        path: '${{ github.workspace }}/**/*.log
+        name: build-log
+        path: 'build.log
 
-          ${{ github.workspace }}/**/*.txt'
+          **/build.log'
