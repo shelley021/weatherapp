@@ -1,7 +1,4 @@
 name: Debug Build
-true:
-- push
-- pull_request
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -36,3 +33,6 @@ jobs:
       env:
         ANDROID_HOME: /usr/local/lib/android/sdk
         ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+'on':
+  push: {}
+  pull_request: {}
