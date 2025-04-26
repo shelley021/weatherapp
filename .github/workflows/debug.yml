@@ -4,29 +4,35 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
-    - name: Install Python dependencies
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    - name: Install dependencies
       run: 'python -m pip install --upgrade pip
 
         pip install -r requirements.txt
 
         '
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.x
-    - name: Build APK
-      run: buildozer android debug
-    - uses: actions/checkout@v4
-    - name: Install dependencies
-      run: 'sudo apt-get update
-
-        sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf
-        libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo6 cmake
-        libffi-dev libssl-dev
-
-        '
     - name: Set up Android SDK
       uses: android-actions/setup-android@v3
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-debug
+        path: app/build/outputs/apk/debug/*.apk
+        if-no-files-found: error
+    - uses: actions/checkout@v4
+    - name: Generate requirements
+      run: 'python -m pip install pipreqs
+
+        pipreqs . --force
+
+        '
+    - name: Build with Gradle
+      run: './gradlew assembleDebug
+
+        '
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
@@ -42,6 +48,11 @@ jobs:
       run: 'pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
 
         pip config set global.trusted-host mirrors.aliyun.com'
+    - name: Install Python dependencies
+      run: 'python -m pip install --upgrade pip setuptools
+
+        pip install buildozer==1.5.0 kivy==2.3.1 requests==2.25.1 cython==0.29.36
+        certifi sdl2_ttf==2.0.18'
     - name: Set up Android SDK and NDK
       uses: android-actions/setup-android@v2
       with:
@@ -99,18 +110,23 @@ jobs:
         p4a.branch = master
 
         EOF'
+    - name: Build APK
+      run: 'buildozer android clean
+
+        buildozer -v android debug deploy 2>&1 | tee build.log || { echo "Build failed,
+        check build.log for details"; exit 1; }'
+      env:
+        OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+        P4A_RELEASE_KEYSTORE: ${{ secrets.P4A_RELEASE_KEYSTORE }}
+        P4A_RELEASE_KEYALIAS: ${{ secrets.P4A_RELEASE_KEYALIAS }}
+        P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}
+        P4A_RELEASE_KEYALIAS_PASSWD: ${{ secrets.P4A_RELEASE_KEYALIAS_PASSWD }}
     - name: Save Build Log
       if: always()
       uses: actions/upload-artifact@v4
       with:
         name: build-log
         path: build.log
-    - name: Upload APK
-      if: success()
-      uses: actions/upload-artifact@v4
-      with:
-        name: weatherapp-apk
-        path: bin/*.apk
 'on':
   push:
     branches:
