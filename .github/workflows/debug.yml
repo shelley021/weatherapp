@@ -25,7 +25,7 @@ jobs:
         ndk-version: 25b
         cmake-version: 3.22.1
     - name: Upload build log
-      if: always() && exists('build.log')
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: build-log
