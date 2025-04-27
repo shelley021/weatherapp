@@ -132,13 +132,7 @@ jobs:
       with:
         name: weatherapp-apk
         path: bin/*.apk
-true:
-  push:
-    branches:
-    - main
 'on':
   push:
     branches:
     - main
-
-# AutoDebug: Retry 1 for run 2025-04-27T09:41:13Z
