@@ -52,9 +52,11 @@ jobs:
         ANDROID_HOME: /opt/android-sdk
         ANDROID_NDK_HOME: /opt/android-ndk-r25c
     - name: Accept Android licenses
-      run: 'yes | sdkmanager --licenses || true
+      run: 'yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses ||
+        true
 
-        sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.0"'
+        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-33"
+        "build-tools;33.0.0"'
     - name: Initialize Buildozer
       run: 'buildozer init
 
@@ -130,9 +132,11 @@ jobs:
       with:
         name: weatherapp-apk
         path: bin/*.apk
+true:
+  push:
+    branches:
+    - main
 'on':
   push:
     branches:
     - main
-
-# AutoDebug: Retry 1 for run 2025-04-27T09:13:36Z
