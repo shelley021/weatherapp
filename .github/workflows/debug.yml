@@ -15,11 +15,16 @@ jobs:
       with:
         python-version: '3.10'
     - name: Install system dependencies
-      run: 'sudo apt-get update
-
-        sudo apt-get install -y git zip unzip python3-pip autoconf libtool pkg-config
-        zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
-        libltdl-dev build-essential python3-dev python3-venv'
+      run: "Ubuntu_version=$(lsb_release -rs)\nif [[ \"$Ubuntu_version\" == \"22.04\"\
+        \ || \"$Ubuntu_version\" == \"24.04\" ]]; then\n  sudo apt-get update\n  sudo\
+        \ apt-get install -y git zip unzip python3-pip autoconf libtool pkg-config\n\
+        \  sudo apt-get install -y zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo6\
+        \ cmake libffi-dev libssl-dev\n  sudo apt-get install -y libltdl-dev build-essential\
+        \ python3-dev python3-venv\nelse\n  sudo apt-get update\n  sudo apt-get install\
+        \ -y git zip unzip python3-pip autoconf libtool pkg-config\n  sudo apt-get\
+        \ install -y zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev\
+        \ libssl-dev\n  sudo apt-get install -y libltdl-dev build-essential python3-dev\
+        \ python3-venv\nfi"
     - name: Configure pip mirror
       run: 'pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
 
@@ -113,25 +118,3 @@ jobs:
   push:
     branches:
     - main
-
-# AutoDebug: Retry 1 for run 2025-04-27T05:04:43Z
-
-# AutoDebug: Retry 1 for run 2025-04-27T05:18:44Z
-
-# AutoDebug: Retry 1 for run 2025-04-27T05:21:01Z
-
-# AutoDebug: Retry 1 for run 2025-04-27T05:21:01Z
-
-# AutoDebug: Retry 1 for run 2025-04-27T05:21:01Z
-
-# AutoDebug: Retry 1 for run 2025-04-27T05:30:10Z
-
-# AutoDebug: Retry 1 for run 2025-04-27T05:32:26Z
-
-# AutoDebug: Retry 1 for run 2025-04-27T05:34:40Z
-
-# AutoDebug: Retry 1 for run 2025-04-27T05:43:32Z
-
-# AutoDebug: Retry 1 for run 2025-04-27T05:45:46Z
-
-# AutoDebug: Retry 1 for run 2025-04-27T05:48:02Z
