@@ -1,8 +1,4 @@
 name: WeatherApp CI
-true:
-  push:
-    branches:
-    - main
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -122,61 +118,3 @@ jobs:
   push:
     branches:
     - main
-
-# AutoDebug: Retry 1 for run 14689418579
-
-# AutoDebug: Retry 1 for run 14689429858
-
-# AutoDebug: Retry 1 for run 14689433383
-
-# AutoDebug: Retry 1 for run 14689436439
-
-# AutoDebug: Retry 1 for run 14689439120
-
-# AutoDebug: Retry 1 for run 14689441605
-
-# AutoDebug: Retry 1 for run 14689444501
-
-# AutoDebug: Retry 1 for run 14689446835
-
-# AutoDebug: Retry 1 for run 14689449831
-
-# AutoDebug: Retry 1 for run 14689452080
-
-# AutoDebug: Retry 1 for run 14689454672
-
-# AutoDebug: Retry 1 for run 14689457040
-
-# AutoDebug: Retry 1 for run 14689460227
-
-# AutoDebug: Retry 1 for run 14689462958
-
-# AutoDebug: Retry 1 for run 14689465665
-
-# AutoDebug: Retry 1 for run 14689467995
-
-# AutoDebug: Retry 1 for run 14689472579
-
-# AutoDebug: Retry 1 for run 14689472579
-
-# AutoDebug: Retry 1 for run 14689513652
-
-# AutoDebug: Retry 1 for run 14689527958
-
-# AutoDebug: Retry 1 for run 14689532860
-
-# AutoDebug: Retry 1 for run unknown
-
-# AutoDebug: Retry 1 for run 14689540558
-
-# AutoDebug: Retry 1 for run 14689858010
-
-# AutoDebug: Retry 1 for run 14689861169
-
-# AutoDebug: Retry 1 for run 14689864012
-
-# AutoDebug: Retry 1 for run 14689867178
-
-# AutoDebug: Retry 1 for run 14689870062
-
-# AutoDebug: Retry 1 for run 14689870062
