@@ -117,50 +117,8 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: weatherapp-apk
-        path: bin/*.apk
+        path: bin/*.apk'
 'on':
   push:
     branches:
     - main
-
-# AutoDebug: Retry 1 for run 14689323649
-
-# AutoDebug: Retry 1 for run 14689328474
-
-# AutoDebug: Retry 1 for run 14689332643
-
-# AutoDebug: Retry 1 for run 14689336354
-
-# AutoDebug: Retry 1 for run 14689340130
-
-# AutoDebug: Retry 1 for run 14689344299
-
-# AutoDebug: Retry 1 for run 14689348593
-
-# AutoDebug: Retry 1 for run 14689351703
-
-# AutoDebug: Retry 1 for run 14689355526
-
-# AutoDebug: Retry 1 for run 14689359345
-
-# AutoDebug: Retry 1 for run 14689362944
-
-# AutoDebug: Retry 1 for run 14689366061
-
-# AutoDebug: Retry 1 for run 14689370019
-
-# AutoDebug: Retry 1 for run 14689374262
-
-# AutoDebug: Retry 1 for run 14689377265
-
-# AutoDebug: Retry 1 for run 14689380902
-
-# AutoDebug: Retry 1 for run 14689384700
-
-# AutoDebug: Retry 1 for run 14689388034
-
-# AutoDebug: Retry 1 for run 14689392194
-
-# AutoDebug: Retry 1 for run 14689396372
-
-# AutoDebug: Retry 1 for run unknown
