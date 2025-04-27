@@ -1,7 +1,7 @@
 name: WeatherApp CI
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: Ubuntu-latest
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v4
@@ -113,9 +113,3 @@ jobs:
   push:
     branches:
     - main
-
-# AutoDebug: Retry 1 for run unknown
-
-# AutoDebug: Retry 1 for run 2025-04-27T04:36:12Z
-
-# AutoDebug: Retry 1 for run 2025-04-27T04:36:45Z
