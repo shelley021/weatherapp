@@ -1,8 +1,4 @@
 name: WeatherApp CI
-true:
-  push:
-    branches:
-    - main
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -132,5 +128,3 @@ jobs:
   push:
     branches:
     - main
-
-# AutoDebug: Retry 1 for run 2025-04-27T08:53:44Z
