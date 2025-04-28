@@ -43,12 +43,12 @@ jobs:
 
         pip install python-for-android'
     - name: Set up Android SDK
-      uses: android-actions/setup-android-sdk@v2
+      uses: android-actions/setup-android@v3
       with:
-        cmdline-tools-version: latest
-        build-tools-version: 33.0.0
-        platform-version: '33'
-        ndk-version: 25.2.9519653
+        cmdline-tools: latest
+        build-tools: 34.0.0
+        platform: android-34
+        ndk: 25.2.9519653
         accept-android-sdk-license: true
     - name: Initialize Buildozer
       run: 'buildozer init
@@ -73,7 +73,7 @@ jobs:
 
         android.permissions = INTERNET
 
-        android.api = 33
+        android.api = 34
 
         android.minapi = 21
 
