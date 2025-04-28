@@ -101,12 +101,19 @@ jobs:
 
         git checkout master'
     - name: Build APK
-      run: "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds\
-        \ -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE\
-        \ -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\n\
-        buildozer android clean\nbuildozer -v android debug deploy 2>&1 | tee build.log\n\
-        if [ ${PIPESTATUS[0]} -ne 0 ]; then\n  echo \"Build failed, check build.log\
-        \ for details\"\n  exit 1\nfi"
+      run: 'export CFLAGS="-Wno-error=implicit-function-declaration -Wno-error=array-bounds
+        -Wno-error=deprecated-declarations"
+
+        export CPPFLAGS="-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700"
+
+        export LDFLAGS="-lnsl -lresolv -lgssapi_krb5"
+
+        buildozer android clean
+
+        buildozer -v android debug deploy > build.log 2>&1 || (cat build.log && exit
+        1)
+
+        cat build.log'
       env:
         OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
         P4A_RELEASE_KEYSTORE: ${{ secrets.P4A_RELEASE_KEYSTORE }}
