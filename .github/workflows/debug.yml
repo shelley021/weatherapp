@@ -16,9 +16,9 @@ jobs:
         python-version: '3.10'
     - name: Install missing libtinfo package
       run: "Ubuntu_version=$(lsb_release -rs)\nif [[ \"$Ubuntu_version\" == \"22.04\"\
-        \ || \"$Ubuntu_version\" == \"24.04\" ]]; then\n  sudo apt-get update\n  sudo\
-        \ apt-get install -y libtinfo6\nelse\n  sudo apt-get update\n  sudo apt-get\
-        \ install -y libtinfo5\nfi"
+        \n  || \"$Ubuntu_version\" == \"24.04\" ]]; then\n  sudo apt-get update\n\
+        \  sudo apt-get install -y libtinfo6\nelse\n  sudo apt-get update\n  sudo\
+        \ apt-get install -y libtinfo5\nfi"
     - name: Install system dependencies
       run: 'sudo apt-get update
 
@@ -45,7 +45,7 @@ jobs:
     - name: Set up Android SDK
       uses: android-actions/setup-android@v3
       with:
-        sdkmanager: 'cmdline-tools;latest
+        sdk-components: 'cmdline-tools;latest
 
           build-tools;33.0.0
 
@@ -141,7 +141,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: weatherapp-apk
-        path: bin/
+        path: bin/*.apk
         if-no-files-found: warn
 'on':
   push:
