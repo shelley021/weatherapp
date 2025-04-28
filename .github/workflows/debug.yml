@@ -110,18 +110,21 @@ jobs:
 
         buildozer android clean
 
-        buildozer -v android debug deploy 2>&1 | tee build.log || { echo "Build failed,
-        check build.log for details"; exit 1; }'
+        { buildozer -v android debug deploy 2>&1 | tee build.log; } || { echo "Build
+        failed, check build.log for details"; exit 1; }'
       env:
         OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
         P4A_RELEASE_KEYSTORE: ${{ secrets.P4A_RELEASE_KEYSTORE }}
         P4A_RELEASE_KEYALIAS: ${{ secrets.P4A_RELEASE_KEYALIAS }}
         P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}
         P4A_RELEASE_KEYALIAS_PASSWD: ${{ secrets.P4A_RELEASE_KEYALIAS_PASSWD }}
-    - name: Check Build Log
+    - name: Verify Build Log
       if: always()
-      run: "if [ -f build.log ]; then\n  echo \"Build log contents:\"\n  tail -n 50\
-        \ build.log\nelse\n  echo \"No build log found\"\n  exit 1\nfi"
+      run: "if [ -f build.log ]; then\n  echo \"Build log exists, checking for errors...\"\
+        \n  if grep -q \"ERROR:\" build.log || grep -q \"FAILED\" build.log; then\n\
+        \    echo \"Errors found in build log:\"\n    grep -E \"ERROR:|FAILED\" build.log\n\
+        \    exit 1\n  else\n    echo \"No critical errors found in build log\"\n\
+        \  fi\nelse\n  echo \"No build log found\"\n  exit 1\nfi"
     - name: Save Build Log
       if: always()
       uses: actions/upload-artifact@v4
