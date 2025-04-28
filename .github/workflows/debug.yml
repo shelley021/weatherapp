@@ -118,6 +118,10 @@ jobs:
         P4A_RELEASE_KEYALIAS: ${{ secrets.P4A_RELEASE_KEYALIAS }}
         P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}
         P4A_RELEASE_KEYALIAS_PASSWD: ${{ secrets.P4A_RELEASE_KEYALIAS_PASSWD }}
+    - name: Check Build Log
+      if: always()
+      run: "if [ -f build.log ]; then\n  echo \"Build log contents:\"\n  tail -n 50\
+        \ build.log\nelse\n  echo \"No build log found\"\n  exit 1\nfi"
     - name: Save Build Log
       if: always()
       uses: actions/upload-artifact@v4
@@ -129,8 +133,8 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: weatherapp-apk
-        path: bin/*.apk
-        if-no-files-found: warn
+        path: bin/weatherapp-*.apk
+        if-no-files-found: error
 'on':
   push:
     branches:
