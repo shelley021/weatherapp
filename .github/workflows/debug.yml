@@ -30,8 +30,7 @@ jobs:
 
         sudo apt-get install -y libltdl-dev build-essential python3-dev python3-venv
 
-        sudo apt-get install -y libnss3-dev libnss3-tools  # Added libnss3-tools for
-        setgrent/getgrent'
+        sudo apt-get install -y libnss3-dev libnss3-tools'
     - name: Configure pip mirror
       run: 'pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
 
@@ -115,7 +114,8 @@ jobs:
     - name: Build APK
       run: 'export CFLAGS="-Wno-error=implicit-function-declaration -Wno-error=array-bounds"
 
-        export CPPFLAGS="-D_GNU_SOURCE"  # For setgrent/getgrent functions
+        export CPPFLAGS="-D_GNU_SOURCE -D_DEFAULT_SOURCE"  # Added _DEFAULT_SOURCE
+        for setgrent/getgrent
 
         buildozer android clean
 
