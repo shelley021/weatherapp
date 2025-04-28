@@ -110,10 +110,8 @@ jobs:
 
         buildozer android clean
 
-        buildozer -v android debug deploy > build.log 2>&1 || (cat build.log && exit
-        1)
-
-        cat build.log'
+        buildozer -v android debug deploy 2>&1 | tee build.log || { cat build.log;
+        exit 1; }'
       env:
         OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
         P4A_RELEASE_KEYSTORE: ${{ secrets.P4A_RELEASE_KEYSTORE }}
