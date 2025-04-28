@@ -110,8 +110,8 @@ jobs:
 
         buildozer android clean
 
-        { buildozer -v android debug deploy 2>&1 | tee build.log; } || { echo "Build
-        failed, check build.log for details"; exit 1; }'
+        buildozer -v android debug deploy 2>&1 | tee build.log || { echo "Build failed,
+        check build.log for details"; exit 1; }'
       env:
         OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
         P4A_RELEASE_KEYSTORE: ${{ secrets.P4A_RELEASE_KEYSTORE }}
