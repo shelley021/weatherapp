@@ -46,11 +46,11 @@ jobs:
       uses: android-actions/setup-android@v3
       with:
         cmdline-tools-version: latest
-        packages: 'build-tools;33.0.2
+        packages: 'build-tools;34.0.0
 
           platform-tools
 
-          platforms;android-33
+          platforms;android-34
 
           ndk;25.2.9519653
 
@@ -79,7 +79,7 @@ jobs:
 
         android.permissions = INTERNET
 
-        android.api = 33
+        android.api = 34
 
         android.minapi = 21
 
