@@ -45,10 +45,10 @@ jobs:
     - name: Set up Android SDK
       uses: android-actions/setup-android@v2
       with:
-        cmdline-tools: latest
-        build-tools: 33.0.0
-        platforms: android-33
-        ndk: 25.2.9519653
+        cmdline-tools-version: latest
+        build-tools-version: 33.0.0
+        platform-version: '33'
+        ndk-version: 25.2.9519653
     - name: Accept Android licenses
       run: 'yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses ||
         true
@@ -113,7 +113,7 @@ jobs:
 
         export CPPFLAGS="-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700"
 
-        export LDFLAGS="-lnsl -lresolv"
+        export LDFLAGS="-lnsl -lresolv -lgssapi_krb5"
 
         buildozer android clean
 
