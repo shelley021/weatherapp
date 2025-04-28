@@ -43,12 +43,17 @@ jobs:
 
         pip install python-for-android'
     - name: Set up Android SDK
-      uses: android-actions/setup-android@v2
+      uses: android-actions/setup-android@v3
       with:
-        cmdline-tools-version: latest
-        build-tools-version: 33.0.0
-        platform-version: '33'
-        ndk-version: 25.2.9519653
+        sdkmanager: 'cmdline-tools;latest
+
+          build-tools;33.0.0
+
+          platforms;android-33
+
+          ndk;25.2.9519653
+
+          '
     - name: Accept Android licenses
       run: 'yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses ||
         true
@@ -136,7 +141,8 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: weatherapp-apk
-        path: bin/*.apk
+        path: bin/
+        if-no-files-found: warn
 'on':
   push:
     branches:
