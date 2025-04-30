@@ -115,18 +115,14 @@ def get_actions_logs(repo, branch, backup_dir, iteration, headers, workflow_file
                 elapsed_outer_time += outer_wait_interval
                 return "", None, None, None, False, [], {}, None, []
 
+            # 按时间戳排序，选择最新运行
+            debug_runs.sort(key=lambda x: x.get("created_at"), reverse=True)
             run = debug_runs[0]
             run_id = run["id"]
             state = run["status"]
             conclusion = run["conclusion"]
             run_commit_sha = run.get("head_sha")
             run_timestamp = run.get("created_at")
-
-            if last_commit_sha and run_commit_sha != last_commit_sha:
-                print(f"[DEBUG] 运行 {run_id} 的 commit SHA ({run_commit_sha}) 不匹配目标 commit SHA ({last_commit_sha})，等待匹配的运行...")
-                time.sleep(outer_wait_interval)
-                elapsed_outer_time += outer_wait_interval
-                continue
 
             run_id_counts = {}  # 临时存储运行计数
             run_id_counts[run_id] = run_id_counts.get(run_id, 0) + 1
@@ -174,7 +170,8 @@ def get_actions_logs(repo, branch, backup_dir, iteration, headers, workflow_file
                     elapsed_time += wait_interval_inner
 
                 if state != "completed":
-                    print(f"运行 {run_id} 在 {max_wait_time} 秒内未完成，继续等待下一轮检查...")
+                    print(f"运行 {run_id} 在 {max_wait_time} 秒内未完成，触发强制推送...")
+                    push_changes_func(f"AutoDebug: Run {run_id} not completed (iteration {iteration})", None, branch)
                     time.sleep(outer_wait_interval)
                     elapsed_outer_time += outer_wait_interval
                     continue
@@ -236,7 +233,7 @@ def get_actions_logs(repo, branch, backup_dir, iteration, headers, workflow_file
 
                             job_annotations = annotations_response.json()
                             annotations.extend(job_annotations)
-                            print(f"[DEBUG] 运行 {run_id} 的完整 Annotations 数据: {json.dumps(job_annotations, indent=2)}")
+                            print(f"[DEBUG] 运行 {run_id} 的完整 Annotations 数据: {job_annotations}")
                             for annotation in job_annotations:
                                 message = annotation.get("message", "")
                                 print(f"[DEBUG] 运行 {run_id} Annotations 信息: {message}")
@@ -317,7 +314,7 @@ def get_actions_logs(repo, branch, backup_dir, iteration, headers, workflow_file
                         elapsed_outer_time += 60
                         return "", None, conclusion, annotations_error, False, successful_steps, error_details, run_timestamp, annotations
 
-                    print(f"[DEBUG] 日志内容（前500字符）: {log_content[:500]}...")
+                    print(f"[DEBUG] 日志内容（前1000字符）: {log_content[:1000]}...")
                     print(f"运行 {run_id} 状态（conclusion={conclusion}, has_critical_error=False)")
                     return log_content, state, conclusion, annotations_error, False, successful_steps, error_details, run_timestamp, annotations
 
@@ -331,4 +328,194 @@ def get_actions_logs(repo, branch, backup_dir, iteration, headers, workflow_file
 
     print(f"在 {max_outer_wait_time} 秒内未找到匹配的运行日志，触发强制推送...")
     push_changes_func(f"AutoDebug: No runs found (iteration {iteration})", None, branch)
+    # 强制推送后等待新运行
+    time.sleep(60)  # 等待 60 秒以确保新运行启动
+    elapsed_outer_time = 0
+    while elapsed_outer_time < max_outer_wait_time:
+        try:
+            response = requests.get(workflow_runs_url, headers=headers, params=params, timeout=30)
+            if response.status_code != 200:
+                print(f"GitHub API请求失败: {response.status_code} {response.text}")
+                time.sleep(outer_wait_interval)
+                elapsed_outer_time += outer_wait_interval
+                continue
+
+            debug_runs = response.json().get("workflow_runs", [])
+            if not debug_runs:
+                print("未找到新运行日志，继续等待...")
+                time.sleep(outer_wait_interval)
+                elapsed_outer_time += outer_wait_interval
+                continue
+
+            # 选择最新运行
+            debug_runs.sort(key=lambda x: x.get("created_at"), reverse=True)
+            run = debug_runs[0]
+            run_id = run["id"]
+            state = run["status"]
+            conclusion = run["conclusion"]
+            run_timestamp = run.get("created_at")
+
+            if run_id in processed_run_ids:
+                print(f"运行 {run_id} 已处理过，继续等待新运行...")
+                time.sleep(outer_wait_interval)
+                elapsed_outer_time += outer_wait_interval
+                continue
+
+            print(f"检测到新运行 {run_id}，状态: {state}, 时间戳: {run_timestamp}")
+            processed_run_ids.add(run_id)
+
+            if state != "completed":
+                print(f"检测到未完成的运行 {run_id}，等待其完成...")
+                max_wait_time = 1200
+                wait_interval_inner = 30
+                elapsed_time = 0
+
+                while elapsed_time < max_wait_time:
+                    run_url = f"https://api.github.com/repos/{repo}/actions/runs/{run_id}"
+                    run_response = requests.get(run_url, headers=headers, timeout=30)
+                    if run_response.status_code != 200:
+                        print(f"获取运行 {run_id} 详情失败: {run_response.status_code}")
+                        time.sleep(wait_interval_inner)
+                        elapsed_time += wait_interval_inner
+                        continue
+
+                    run_data = run_response.json()
+                    state = run_data.get("status")
+                    conclusion = run_data.get("conclusion")
+                    print(f"运行 {run_id} 当前状态: {state}, 结果: {conclusion}")
+
+                    if state == "completed":
+                        break
+
+                    time.sleep(wait_interval_inner)
+                    elapsed_time += wait_interval_inner
+
+                if state != "completed":
+                    print(f"运行 {run_id} 在 {max_wait_time} 秒内未完成，继续等待...")
+                    time.sleep(outer_wait_interval)
+                    elapsed_outer_time += outer_wait_interval
+                    continue
+
+            # 获取新运行的日志和 annotations
+            run_url = f"https://api.github.com/repos/{repo}/actions/runs/{run_id}"
+            run_response = requests.get(run_url, headers=headers, timeout=30)
+            if run_response.status_code != 200:
+                print(f"获取新运行 {run_id} 详情失败: {run_response.status_code}")
+                time.sleep(outer_wait_interval)
+                elapsed_outer_time += outer_wait_interval
+                continue
+
+            run_data = run_response.json()
+            error_message = run_data.get("message", "")
+            print(f"[DEBUG] 新运行 {run_id} 元数据错误信息: {error_message}")
+
+            jobs_url = f"https://api.github.com/repos/{repo}/actions/runs/{run_id}/jobs"
+            annotations_error = ""
+            error_details = {}
+            successful_steps = []
+            annotations = []
+
+            jobs_response = requests.get(jobs_url, headers=headers, timeout=30)
+            if jobs_response.status_code != 200:
+                print(f"获取新运行 {run_id} 的 Jobs 信息失败: {jobs_response.status_code}")
+                annotations_error = "Invalid workflow file"
+            else:
+                jobs_data = jobs_response.json()
+                jobs = jobs_data.get("jobs", [])
+                if not jobs:
+                    print(f"运行 {run_id} 未找到 Jobs 信息，使用默认错误信息...")
+                    annotations_error = "Invalid workflow file"
+                else:
+                    for job in jobs:
+                        annotations_url = job.get("annotations_url")
+                        if annotations_url:
+                            annotations_response = requests.get(annotations_url, headers=headers, timeout=30)
+                            if annotations_response.status_code == 200:
+                                job_annotations = annotations_response.json()
+                                annotations.extend(job_annotations)
+                                print(f"[DEBUG] 新运行 {run_id} 的完整 Annotations 数据: {job_annotations}")
+                                for annotation in job_annotations:
+                                    message = annotation.get("message", "")
+                                    print(f"[DEBUG] 新运行 {run_id} Annotations 信息: {message}")
+                                    if annotation.get("annotation_level") in ["failure", "error"]:
+                                        annotations_error += message + "\n"
+                                        line_match = re.search(r"Line: (\d+)", message)
+                                        value_match = re.search(r"Unexpected value '(\w+)'", message, re.IGNORECASE)
+                                        error_details["line"] = int(line_match.group(1)) if line_match else None
+                                        error_details["invalid_value"] = value_match.group(1) if value_match else None
+                                        print(f"[DEBUG] 提取的错误详情: {error_details}")
+
+            if conclusion == "startup_failure" and annotations_error:
+                if not annotations_error:
+                    annotations_error = "Invalid workflow file"
+                print(f"[DEBUG] 最终 Annotations 错误: {annotations_error}")
+                print(f"运行 {run_id} 失败（startup_failure），尝试修复...")
+                return "", None, conclusion, annotations_error, False, [], error_details, run_timestamp, annotations
+
+            logs_url = f"https://api.github.com/repos/{repo}/actions/runs/{run_id}/logs"
+            logs_response = requests.get(logs_url, headers=headers, timeout=30)
+
+            if logs_response.status_code == 404:
+                print(f"运行 {run_id} 的日志尚未生成，继续等待...")
+                time.sleep(outer_wait_interval)
+                elapsed_outer_time += outer_wait_interval
+                continue
+
+            if logs_response.status_code != 200:
+                print(f"获取新运行 {run_id} 的日志失败: {logs_response.status_code}")
+                time.sleep(outer_wait_interval)
+                elapsed_outer_time += outer_wait_interval
+                continue
+
+            try:
+                with zipfile.ZipFile(BytesIO(logs_response.content)) as zip_file:
+                    if not zip_file.namelist():
+                        print(f"运行 {run_id} 的日志压缩包为空")
+                        time.sleep(outer_wait_interval)
+                        elapsed_outer_time += outer_wait_interval
+                        continue
+
+                    log_filename = next((n for n in zip_file.namelist() if n.endswith('.txt')), None)
+                    if not log_filename:
+                        print(f"运行 {run_id} 的日志格式异常")
+                        time.sleep(outer_wait_interval)
+                        elapsed_outer_time += outer_wait_interval
+                        continue
+
+                    print(f"成功获取新运行 {run_id} 的日志")
+                    with zip_file.open(log_filename) as log_file:
+                        log_content = log_file.read().decode('utf-8', errors='ignore')
+                        log_content = log_content.lstrip('\ufeff')
+
+                    os.makedirs(os.path.join(project_root, "logs"), exist_ok=True)
+                    with open(os.path.join(project_root, "logs", "full_log.txt"), "w", encoding="utf-8") as f:
+                        f.write(log_content)
+                    print("[DEBUG] 完整日志已保存到 logs/full_log.txt")
+
+                    lines = log_content.splitlines()
+                    current_step = None
+                    for line in lines:
+                        step_match = re.match(r"^\d+\s*Run\s+(.+?)$", line)
+                        if step_match:
+                            current_step = step_match.group(1).strip()
+                        if current_step:
+                            successful_steps.append(current_step)
+
+                    print(f"[DEBUG] 成功的步骤: {successful_steps}")
+                    print(f"[DEBUG] 日志内容（前1000字符）: {log_content[:1000]}...")
+                    print(f"运行 {run_id} 状态（conclusion={conclusion}, has_critical_error=False)")
+                    return log_content, state, conclusion, annotations_error, False, successful_steps, error_details, run_timestamp, annotations
+
+            except Exception as e:
+                print(f"处理新运行 {run_id} 的日志时出错: {e}")
+                time.sleep(outer_wait_interval)
+                elapsed_outer_time += outer_wait_interval
+                continue
+
+        except Exception as e:
+            print(f"GitHub API请求异常: {e}")
+            time.sleep(outer_wait_interval)
+            elapsed_outer_time += outer_wait_interval
+
+    print("[ERROR] 在 1800 秒内未获取到新运行日志，停止尝试")
     return "", None, None, None, False, [], {}, None, []

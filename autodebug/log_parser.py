@@ -9,7 +9,7 @@ def parse_log_content(log_content, workflow_file, annotations_error, error_detai
     exit_codes = []
     new_error_patterns = config.get('new_error_patterns', [])
     
-    # 定义错误模式（从 log_retriever.py 中提取并统一管理）
+    # 定义错误模式
     error_patterns = [
         {
             "pattern": r"sdkmanager: command not found",
@@ -67,7 +67,7 @@ def parse_log_content(log_content, workflow_file, annotations_error, error_detai
         }
     ]
 
-    # 定义关键错误模式（与 log_retriever.py 中的 critical_errors 一致）
+    # 定义关键错误模式
     critical_errors = [
         r"command not found",
         r"failed to execute",
@@ -76,6 +76,9 @@ def parse_log_content(log_content, workflow_file, annotations_error, error_detai
         r"Invalid workflow file",
         r"runs-on.*not supported",
         r"E: Unable to locate package",
+        r"failed with exit code",
+        r"permission denied",
+        r"not found",
     ]
 
     try:
@@ -137,10 +140,17 @@ def parse_log_content(log_content, workflow_file, annotations_error, error_detai
                     new_pattern = r"not found"
                 elif "failed to execute" in line.lower():
                     new_pattern = r"failed to execute"
+                elif "permission denied" in line.lower():
+                    new_pattern = r"permission denied"
                 if new_pattern and new_pattern not in [p["pattern"] for p in error_patterns] and new_pattern not in new_error_patterns:
                     new_error_patterns.append(new_pattern)
                     print(f"[DEBUG] 检测到新错误模式: {new_pattern}")
                     config['new_error_patterns'] = new_error_patterns
+
+        # 打印提取的错误信息
+        print(f"[DEBUG] 提取的错误信息: {errors}")
+        print(f"[DEBUG] 错误上下文: {error_contexts}")
+        print(f"[DEBUG] 退出代码: {exit_codes}")
 
         return errors, error_contexts, exit_codes, new_error_patterns
 

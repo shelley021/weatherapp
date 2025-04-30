@@ -27,7 +27,7 @@ def main():
     max_iterations = 10
     iteration = 0
     error_patterns = load_error_patterns(os.path.join(project_root, 'error_patterns.json'))
-    processed_run_ids = set()  # 记录已处理的运行 ID
+    processed_run_ids = set()
 
     while iteration < max_iterations:
         iteration += 1
@@ -69,9 +69,22 @@ def main():
         )
 
         history = load_fix_history(config['FIX_HISTORY_FILE'])
-        for error_message in errors:
+        for error_message, context in zip(errors, error_contexts):
+            # 记录修改位置（例如步骤名称或字段）
+            modified_section = context.get("step") or "unknown_section"
+            if annotations_error and "Invalid workflow file" in annotations_error:
+                modified_section = "workflow_structure"
+            elif error_details.get("invalid_value"):
+                modified_section = "on_field"
+
+            # 记录修复历史和修改位置
             add_to_fix_history(
-                error_message, "Applied fix" if fixed else "No fix applied", last_commit_sha, fixed, config['FIX_HISTORY_FILE']
+                error_message, 
+                "Applied fix" if fixed else "No fix applied", 
+                last_commit_sha, 
+                conclusion == "success",  # 如果运行成功，标记为成功
+                config['FIX_HISTORY_FILE'],
+                modified_section=modified_section
             )
 
         if fixed:
