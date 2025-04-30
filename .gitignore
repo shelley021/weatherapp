@@ -1,2 +1,4 @@
 auto_debug.py
 .env
+debug/
+autodebug/
