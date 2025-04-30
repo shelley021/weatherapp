@@ -1,44 +1,55 @@
-[
-  {
-    "error_message": "Workflow file not found (404)",
-    "fix_applied": "DeepSeek analysis failed to provide a valid fix",
-    "commit_sha": "29ee1d5dc852a304c29624a44ae4f9224dd47c6e",
-    "success": false,
-    "timestamp": "2025-04-29T12:50:31.158329"
-  },
-  {
-    "error_message": "Failed to verify workflow file",
-    "fix_applied": "DeepSeek analysis failed to provide a valid fix",
-    "commit_sha": "8c591af6142b3e8e737d45028ffea06714c3c589",
-    "success": false,
-    "timestamp": "2025-04-29T13:41:17.830170"
-  },
-  {
-    "error_message": "Failed to verify workflow file",
-    "fix_applied": "DeepSeek analysis failed to provide a valid fix",
-    "commit_sha": "2c7f24250746c250b23a9c8542f423170a8eea62",
-    "success": false,
-    "timestamp": "2025-04-29T13:54:46.068993"
-  },
-  {
-    "error_message": "Unknown error",
-    "fix_applied": "DeepSeek analysis failed to provide a valid fix",
-    "commit_sha": "e316b26fc862140742d1a592467bc001bef88c13",
-    "success": false,
-    "timestamp": "2025-04-29T14:40:55.676986"
-  },
-  {
-    "error_message": "Unknown error",
-    "fix_applied": "DeepSeek analysis failed to provide a valid fix",
-    "commit_sha": "e316b26fc862140742d1a592467bc001bef88c13",
-    "success": false,
-    "timestamp": "2025-04-29T14:50:25.713503"
-  },
-  {
-    "error_message": "Unknown error",
-    "fix_applied": "DeepSeek analysis failed to provide a valid fix",
-    "commit_sha": "4be1e19dd0c03e65e8b0f05db099d99ca8cd397b",
-    "success": false,
-    "timestamp": "2025-04-30T10:30:06.775088"
-  }
-]
+{
+  "history": [
+    {
+      "error_message": "Workflow file not found (404)",
+      "fix_applied": "DeepSeek analysis failed to provide a valid fix",
+      "commit_sha": "29ee1d5dc852a304c29624a44ae4f9224dd47c6e",
+      "success": false,
+      "timestamp": "2025-04-29T12:50:31.158329"
+    },
+    {
+      "error_message": "Failed to verify workflow file",
+      "fix_applied": "DeepSeek analysis failed to provide a valid fix",
+      "commit_sha": "8c591af6142b3e8e737d45028ffea06714c3c589",
+      "success": false,
+      "timestamp": "2025-04-29T13:41:17.830170"
+    },
+    {
+      "error_message": "Failed to verify workflow file",
+      "fix_applied": "DeepSeek analysis failed to provide a valid fix",
+      "commit_sha": "2c7f24250746c250b23a9c8542f423170a8eea62",
+      "success": false,
+      "timestamp": "2025-04-29T13:54:46.068993"
+    },
+    {
+      "error_message": "Unknown error",
+      "fix_applied": "DeepSeek analysis failed to provide a valid fix",
+      "commit_sha": "e316b26fc862140742d1a592467bc001bef88c13",
+      "success": false,
+      "timestamp": "2025-04-29T14:40:55.676986"
+    },
+    {
+      "error_message": "Unknown error",
+      "fix_applied": "DeepSeek analysis failed to provide a valid fix",
+      "commit_sha": "e316b26fc862140742d1a592467bc001bef88c13",
+      "success": false,
+      "timestamp": "2025-04-29T14:50:25.713503"
+    },
+    {
+      "error_message": "Unknown error",
+      "fix_applied": "DeepSeek analysis failed to provide a valid fix",
+      "commit_sha": "4be1e19dd0c03e65e8b0f05db099d99ca8cd397b",
+      "success": false,
+      "timestamp": "2025-04-30T10:30:06.775088"
+    },
+    {
+      "timestamp": "2025-04-30T06:19:41.558727",
+      "error_message": "Process failed with exit code 1",
+      "fix_applied": "No fix applied",
+      "commit_sha": "30654cc441db36b7325570cb5f98b453849d3a93",
+      "success": false,
+      "modified_section": "unknown_section"
+    }
+  ],
+  "protected_sections": {}
+}

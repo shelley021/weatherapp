@@ -67,7 +67,7 @@ def parse_log_content(log_content, workflow_file, annotations_error, error_detai
         }
     ]
 
-    # 定义关键错误模式
+    # 定义关键错误模式，扩展以捕获更多错误
     critical_errors = [
         r"command not found",
         r"failed to execute",
@@ -79,12 +79,20 @@ def parse_log_content(log_content, workflow_file, annotations_error, error_detai
         r"failed with exit code",
         r"permission denied",
         r"not found",
+        r"##\[error\]",  # GitHub Actions 的错误标记
+        r"failed: ",  # 常见的失败模式
+        r"exception: ",
+        r"cannot ",
+        r"unable to ",
     ]
 
     try:
         lines = log_content.splitlines()
         current_step = None
         error_lines = []
+
+        # 打印日志行数以便调试
+        print(f"[DEBUG] 日志总行数: {len(lines)}")
 
         # 提取错误行，使用更广泛的模式
         for i, line in enumerate(lines):
@@ -99,6 +107,7 @@ def parse_log_content(log_content, workflow_file, annotations_error, error_detai
                 if re.search(error_pattern, line, re.IGNORECASE):
                     error_lines.append((i, line, current_step))
                     error_detected = True
+                    print(f"[DEBUG] 检测到错误行 {i}: {line}")
                     break
 
             # 提取退出代码
@@ -142,6 +151,10 @@ def parse_log_content(log_content, workflow_file, annotations_error, error_detai
                     new_pattern = r"failed to execute"
                 elif "permission denied" in line.lower():
                     new_pattern = r"permission denied"
+                elif "failed: " in line.lower():
+                    new_pattern = r"failed: "
+                elif "cannot " in line.lower():
+                    new_pattern = r"cannot "
                 if new_pattern and new_pattern not in [p["pattern"] for p in error_patterns] and new_pattern not in new_error_patterns:
                     new_error_patterns.append(new_pattern)
                     print(f"[DEBUG] 检测到新错误模式: {new_pattern}")
@@ -151,6 +164,16 @@ def parse_log_content(log_content, workflow_file, annotations_error, error_detai
         print(f"[DEBUG] 提取的错误信息: {errors}")
         print(f"[DEBUG] 错误上下文: {error_contexts}")
         print(f"[DEBUG] 退出代码: {exit_codes}")
+
+        # 如果没有提取到错误，但有退出代码，记录通用错误
+        if not errors and exit_codes:
+            errors.append(f"Process failed with exit code {exit_codes[0]}")
+            error_contexts.append({
+                "error_line": f"Process failed with exit code {exit_codes[0]}",
+                "context": "No specific error message found in logs",
+                "step": None
+            })
+            print(f"[DEBUG] 未找到具体错误，但检测到退出代码: {exit_codes}")
 
         return errors, error_contexts, exit_codes, new_error_patterns
 

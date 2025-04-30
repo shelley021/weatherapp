@@ -8,7 +8,12 @@ def load_fix_history(history_file):
         return {"history": [], "protected_sections": {}}
     try:
         with open(history_file, 'r') as f:
-            return json.load(f)
+            history_data = json.load(f)
+            # 检查 history_data 是否为列表，如果是，则转换为正确的字典格式
+            if isinstance(history_data, list):
+                print("[DEBUG] fix_history.json 格式为列表，转换为字典格式")
+                history_data = {"history": history_data, "protected_sections": {}}
+            return history_data
     except Exception as e:
         print(f"[ERROR] 加载修复历史失败: {e}")
         return {"history": [], "protected_sections": {}}
