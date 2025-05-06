@@ -206,3 +206,5 @@ jobs:
         '
     - name: Clean Disk Space
       run: rm -rf /tmp/* && docker system prune -a --force
+    - name: Clean Build Cache
+      run: rm -rf ~/.buildozer/cache && buildozer android clean
