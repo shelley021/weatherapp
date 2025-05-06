@@ -204,3 +204,5 @@ jobs:
       run: 'chmod +x ./script.sh  # 根据具体文件调整
 
         '
+    - name: Clean Disk Space
+      run: rm -rf /tmp/* && docker system prune -a --force
