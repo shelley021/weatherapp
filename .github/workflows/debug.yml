@@ -211,3 +211,5 @@ jobs:
     - name: Force NDK Redownload
       run: rm -rf ~/.buildozer/android/platform/android-ndk-* && buildozer android
         debug
+    - name: Check Network Connectivity
+      run: ping -c 4 google.com || echo '网络连接失败，请检查网络'
