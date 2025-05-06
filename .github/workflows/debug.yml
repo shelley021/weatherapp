@@ -208,3 +208,6 @@ jobs:
       run: rm -rf /tmp/* && docker system prune -a --force
     - name: Clean Build Cache
       run: rm -rf ~/.buildozer/cache && buildozer android clean
+    - name: Force NDK Redownload
+      run: rm -rf ~/.buildozer/android/platform/android-ndk-* && buildozer android
+        debug
