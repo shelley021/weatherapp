@@ -197,7 +197,7 @@ jobs:
           df -h
           du -h /tmp -d 1 || echo '无法检查 /tmp 目录'
 
-      # 运行 autodebug.main 进行修复
+      # 运行 autodebug.main 进行修复 1
       - name: Run Autodebug for Fixes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
