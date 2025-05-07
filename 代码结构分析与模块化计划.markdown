@@ -55,11 +55,7 @@
      - 函数：`load_fix_history`、`save_fix_history`、`add_to_fix_history`。
    - **理由**：隔离历史管理，便于在其他调试工具中重用，并减少主脚本的杂乱。
 
-### 3. `workflow_validator.py`
-   - **用途**：验证和清理 GitHub Actions 工作流文件。
-   - **内容**：
-     - 函数：`validate_workflow_file`、`clean_workflow`、`ensure_on_field`、`save_workflow`。
-   - **理由**：分组工作流相关操作，便于维护和测试工作流验证逻辑。
+
 
 ### 4. `log_retriever.py`
    - **用途**：获取和管理 GitHub Actions 日志。
@@ -102,17 +98,17 @@
 ## 实现建议
 1. **文件结构示例**：
    ```
+   requirements.txt
    autodebug/
    ├── config.py
    ├── history.py
-   ├── workflow_validator.py
    ├── log_retriever.py
    ├── log_parser.py
    ├── error_patterns.py
    ├── fix_applier.py
    ├── git_utils.py
    ├── main.py
-   └── requirements.txt
+   
    ```
 
 2. **模块间通信**：
