@@ -217,3 +217,5 @@ jobs:
       run: export HTTP_PROXY=http://proxy.example.com:8080 && export HTTPS_PROXY=http://proxy.example.com:8080
     - name: Retry Build
       run: buildozer android debug || buildozer android debug
+    - name: Clean Dependency Cache
+      run: pip cache purge
