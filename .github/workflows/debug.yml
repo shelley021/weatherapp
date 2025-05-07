@@ -219,3 +219,5 @@ jobs:
       run: buildozer android debug || buildozer android debug
     - name: Clean Dependency Cache
       run: pip cache purge
+    - name: Update Dependencies
+      run: pip install --upgrade pip setuptools kivy buildozer
