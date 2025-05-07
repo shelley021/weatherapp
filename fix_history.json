@@ -1,11 +1,5 @@
 {
   "history": [],
   "protected_sections": [],
-  "untried_errors": [
-    "2025-05-06T08:00:56.5482255Z du: cannot read directory '/tmp/systemd-private-757e4d9ab63848b883bf3393260738a2-systemd-logind.service-n6hDlP': Permission denied",
-    "2025-05-06T08:01:05.6396348Z ValueError: read of closed file",
-    "Pattern not matched: Successfully built APK",
-    "2025-05-07T07:22:00.6147128Z du: cannot read directory '/tmp/systemd-private-bc613492480c411c887fa5674351b743-polkit.service-dFymie': Permission denied",
-    "2025-05-07T07:22:36.4505930Z ValueError: read of closed file"
-  ]
+  "untried_errors": []
 }
