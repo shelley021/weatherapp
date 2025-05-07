@@ -1,25 +1,23 @@
 name: WeatherApp CI
-on:
-  push:
-    branches:
-    - main
+true:
   pull_request:
     branches:
     - main
+  push:
+    branches:
+    - main
 jobs:
-  
   build:
     permissions:
       contents: write
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
-        java-version: '17'
         distribution: temurin
+        java-version: '17'
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -61,9 +59,9 @@ jobs:
     - name: Set up Android SDK
       uses: android-actions/setup-android@v3
       with:
+        accept-android-sdk-licenses: true
         cmdline-tools-version: latest
         packages: build-tools;34.0.0 platform-tools platforms;android-34 ndk;25.2.9519653
-        accept-android-sdk-licenses: true
     - name: Initialize Buildozer
       run: 'buildozer init
 
@@ -121,49 +119,48 @@ jobs:
 
         '
     - name: Check Disk Space Before Build
-      run: 'df -h
-
-        du -h /tmp -d 1 || echo ''无法检查 /tmp 目录''
-
-        '
-    - name: Build APK
+      run: "df -h\ndu -h /tmp -d 1 || echo '\u65E0\u6CD5\u68C0\u67E5 /tmp \u76EE\u5F55\
+        '\n"
+    - env:
+        OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+        P4A_RELEASE_KEYALIAS: ${{ secrets.P4A_RELEASE_KEYALIAS }}
+        P4A_RELEASE_KEYALIAS_PASSWD: ${{ secrets.P4A_RELEASE_KEYALIAS_PASSWD }}
+        P4A_RELEASE_KEYSTORE: ${{ secrets.P4A_RELEASE_KEYSTORE }}
+        P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}
+      name: Build APK
       run: "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds\
         \ -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE\
         \ -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\n\
         buildozer android clean\nbuildozer -v android debug deploy 2>&1 | tee build.log\n\
         if [ ${PIPESTATUS[0]} -ne 0 ]; then\n  cat build.log\n  exit 1\nfi\n"
-      env:
-        OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
-        P4A_RELEASE_KEYSTORE: ${{ secrets.P4A_RELEASE_KEYSTORE }}
-        P4A_RELEASE_KEYALIAS: ${{ secrets.P4A_RELEASE_KEYALIAS }}
-        P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}
-        P4A_RELEASE_KEYALIAS_PASSWD: ${{ secrets.P4A_RELEASE_KEYALIAS_PASSWD }}
-    - name: Verify Build Log
-      if: always()
+    - if: always()
+      name: Verify Build Log
       run: "if [ -f build.log ]; then\n  echo \"Build log exists, checking for errors...\"\
         \n  if grep -q -E \"ERROR:|FAILED\" build.log; then\n    echo \"Errors found\
         \ in build log:\"\n    grep -E \"ERROR:|FAILED\" build.log\n    exit 1\n \
         \ else\n    echo \"No critical errors found in build log\"\n  fi\nelse\n \
         \ echo \"No build log found\"\n  exit 1\nfi\n"
-    - name: Save Build Log
-      if: always()
+    - if: always()
+      name: Save Build Log
       uses: actions/upload-artifact@v4
       with:
         name: build-log
         path: build.log
         retention-days: 1
-    - name: Upload APK
-      if: success()
+    - if: success()
+      name: Upload APK
       uses: actions/upload-artifact@v4
       with:
+        if-no-files-found: error
         name: weatherapp-apk
         path: bin/weatherapp-*.apk
-        if-no-files-found: error
         retention-days: 1
     - name: Retry Android NDK Download
-      run: "ping -c 4 google.com || echo \"网络连接失败，请检查网络\"\nfor i in {1..3}; do\n \
-        \ echo \"尝试下载 Android NDK，第 $i 次\"\n  buildozer android debug && break\n \
-        \ echo \"下载失败，等待 10 秒后重试...\"\n  sleep 10\ndone\n"
+      run: "ping -c 4 google.com || echo \"\u7F51\u7EDC\u8FDE\u63A5\u5931\u8D25\uFF0C\
+        \u8BF7\u68C0\u67E5\u7F51\u7EDC\"\nfor i in {1..3}; do\n  echo \"\u5C1D\u8BD5\
+        \u4E0B\u8F7D Android NDK\uFF0C\u7B2C $i \u6B21\"\n  buildozer android debug\
+        \ && break\n  echo \"\u4E0B\u8F7D\u5931\u8D25\uFF0C\u7B49\u5F85 10 \u79D2\u540E\
+        \u91CD\u8BD5...\"\n  sleep 10\ndone\n"
     - name: Manually Install Android NDK
       run: 'wget -O android-ndk.zip https://dl.google.com/android/repository/android-ndk-r23b-linux.zip
 
@@ -178,35 +175,32 @@ jobs:
         buildozer android debug
 
         '
-    - name: Set Download Timeout
-      run: export BUILDOCZER_TIMEOUT=600
-      env:
+    - env:
         BUILDOCZER_TIMEOUT: 600
+      name: Set Download Timeout
+      run: export BUILDOCZER_TIMEOUT=600
     - name: Verify APK Generation
       run: "if [ ! -f build/outputs/apk/debug/weatherapp.apk ]; then\n  echo \"APK\
-        \ 未生成，重新构建\"\n  buildozer android debug\nfi\n"
+        \ \u672A\u751F\u6210\uFF0C\u91CD\u65B0\u6784\u5EFA\"\n  buildozer android\
+        \ debug\nfi\n"
     - name: Use Cached NDK
       run: buildozer android use_cached_ndk
     - name: Verify Build Success
       run: buildozer android debug || exit 1
-    - name: Check Disk Space After Build
-      if: always()
-      run: 'df -h
-
-        du -h /tmp -d 1 || echo ''无法检查 /tmp 目录''
-
-        '
-    - name: Run Autodebug for Fixes
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - if: always()
+      name: Check Disk Space After Build
+      run: "df -h\ndu -h /tmp -d 1 || echo '\u65E0\u6CD5\u68C0\u67E5 /tmp \u76EE\u5F55\
+        '\n"
+    - env:
         DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      name: Run Autodebug for Fixes
       run: 'pip install requests pyyaml python-dotenv
 
         python3 -m autodebug.main'
     - name: Fix Permissions
-      run: 'chmod +x ./script.sh  # 根据具体文件调整
-
-        '
+      run: "chmod +x ./script.sh  # \u6839\u636E\u5177\u4F53\u6587\u4EF6\u8C03\u6574\
+        \n"
     - name: Clean Disk Space
       run: rm -rf /tmp/* && docker system prune -a --force
     - name: Clean Build Cache
@@ -215,7 +209,8 @@ jobs:
       run: rm -rf ~/.buildozer/android/platform/android-ndk-* && buildozer android
         debug
     - name: Check Network Connectivity
-      run: ping -c 4 google.com || echo '网络连接失败，请检查网络'
+      run: "ping -c 4 google.com || echo '\u7F51\u7EDC\u8FDE\u63A5\u5931\u8D25\uFF0C\
+        \u8BF7\u68C0\u67E5\u7F51\u7EDC'"
     - name: Set Network Proxy
       run: export HTTP_PROXY=http://proxy.example.com:8080 && export HTTPS_PROXY=http://proxy.example.com:8080
     - name: Retry Build
@@ -224,3 +219,8 @@ jobs:
       run: pip cache purge
     - name: Update Dependencies
       run: pip install --upgrade pip setuptools kivy buildozer
+    - - name: Initial Trigger Step
+        run: echo 'Initial trigger to start a new workflow'
+    timeout-minutes: 30
+permissions:
+  contents: write
