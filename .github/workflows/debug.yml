@@ -1,5 +1,5 @@
 name: WeatherApp CI
-true:
+on:
   push:
     branches:
     - main
@@ -7,7 +7,10 @@ true:
     branches:
     - main
 jobs:
+  
   build:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
