@@ -215,3 +215,5 @@ jobs:
       run: ping -c 4 google.com || echo '网络连接失败，请检查网络'
     - name: Set Network Proxy
       run: export HTTP_PROXY=http://proxy.example.com:8080 && export HTTPS_PROXY=http://proxy.example.com:8080
+    - name: Retry Build
+      run: buildozer android debug || buildozer android debug
