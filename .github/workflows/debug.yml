@@ -221,6 +221,17 @@ jobs:
       run: pip install --upgrade pip setuptools kivy buildozer
     - - name: Initial Trigger Step
         run: echo 'Initial trigger to start a new workflow'
+    - - name: Initial Trigger Step
+        run: echo 'Initial trigger to start a new workflow'
     timeout-minutes: 30
 permissions:
   contents: write
+'on':
+  pull_request:
+    branches:
+    - main
+  push:
+    branches:
+    - main
+
+# AutoDebug: Forced change at 2025-05-07T07:51:39Z
