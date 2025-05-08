@@ -1,3 +1,13 @@
+name: WeatherApp CI
+'on':
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: Ubuntu-latest
@@ -98,34 +108,34 @@ jobs:
         cd .buildozer/android/platform/python-for-android
 
         git checkout master'
-    - env:
+    - name: Build APK
+      env:
         OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
         P4A_RELEASE_KEYALIAS: ${{ secrets.P4A_RELEASE_KEYALIAS }}
         P4A_RELEASE_KEYALIAS_PASSWD: ${{ secrets.P4A_RELEASE_KEYALIAS_PASSWD }}
         P4A_RELEASE_KEYSTORE: ${{ secrets.P4A_RELEASE_KEYSTORE }}
         P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}
-      name: Build APK
       run: "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds\
         \ -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE\
         \ -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\n\
         buildozer android clean\nbuildozer -v android debug deploy 2>&1 | tee build.log\n\
         if [ ${PIPESTATUS[0]} -ne 0 ]; then\n  cat build.log\n  exit 1\nfi"
-    - if: always()
-      name: Verify Build Log
+    - name: Verify Build Log
+      if: always()
       run: "if [ -f build.log ]; then\n  echo \"Build log exists, checking for errors...\"\
         \n  if grep -q -E \"ERROR:|FAILED\" build.log; then\n    echo \"Errors found\
         \ in build log:\"\n    grep -E \"ERROR:|FAILED\" build.log\n    exit 1\n \
         \ else\n    echo \"No critical errors found in build log\"\n  fi\nelse\n \
         \ echo \"No build log found\"\n  exit 1\nfi"
-    - if: always()
-      name: Save Build Log
+    - name: Save Build Log
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: build-log
         path: build.log
         retention-days: 1
-    - if: success()
-      name: Upload APK
+    - name: Upload APK
+      if: success()
       uses: actions/upload-artifact@v4
       with:
         if-no-files-found: error
@@ -134,15 +144,5 @@ jobs:
         retention-days: 1
     - name: Initial Trigger Step
       run: echo 'Initial trigger to start a new workflow'
-name: WeatherApp CI
-'on':
-  pull_request:
-    branches:
-    - main
-  push:
-    branches:
-    - main
-permissions:
-  contents: write
 
-# AutoDebug: Forced change at 2025-05-08T06:01:18.573502+00:00
+# AutoDebug: Forced change at 2025-05-08T06:44:43.097201+00:00
