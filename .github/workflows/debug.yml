@@ -13,12 +13,12 @@ jobs:
     runs-on: Ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Check disk space
-      run: 'df -h
+    - name: Clean workspace and cache
+      run: 'sudo apt-get clean
 
-        sudo apt-get clean
+        rm -rf ~/.buildozer/cache
 
-        sudo rm -rf /usr/local/lib/android/sdk/ndk-bundle
+        df -h
 
         '
     - name: Set up JDK 17
@@ -207,4 +207,4 @@ jobs:
         path: bin/weatherapp-*.apk
         retention-days: 1
 
-# AutoDebug: Forced change at 2025-05-08T07:19:34.915898+00:00
+# AutoDebug: Forced change at 2025-05-08T07:25:14.906183+00:00
