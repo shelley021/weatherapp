@@ -2311,15 +2311,12 @@
     }
   },
   "AutoDebug: Initial trigger to start a new workflow": {
-    "timestamp": "2025-05-07T08:44:04.057181+00:00",
+    "timestamp": "2025-05-08T07:31:58.681716+00:00",
     "changes": {
       "before": {
         "jobs": {
           "build": {
-            "permissions": {
-              "contents": "write"
-            },
-            "runs-on": "ubuntu-latest",
+            "runs-on": "Ubuntu-latest",
             "steps": [
               {
                 "uses": "actions/checkout@v4"
@@ -2341,19 +2338,19 @@
               },
               {
                 "name": "Install missing libtinfo package",
-                "run": "Ubuntu_version=$(lsb_release -rs)\nif [[ \"$Ubuntu_version\" == \"22.04\" || \"$Ubuntu_version\" == \"24.04\" ]]; then\n  sudo apt-get update -y\n  sudo apt-get install -y libtinfo6\nelse\n  sudo apt-get update -y\n  sudo apt-get install -y libtinfo5\nfi\n"
+                "run": "Ubuntu_version=$(lsb_release -rs)\nif [[ \"$Ubuntu_version\" == \"22.04\" || \"$Ubuntu_version\" == \"24.04\" ]]; then\n  sudo apt-get update -y\n  sudo apt-get install -y libtinfo6\nelse\n  sudo apt-get update -y\n  sudo apt-get install -y libtinfo5\nfi"
               },
               {
                 "name": "Install system dependencies",
-                "run": "sudo apt-get update -y\nsudo apt-get install -y git zip unzip python3-pip autoconf libtool pkg-config\nsudo apt-get install -y zlib1g-dev libncurses5-dev libncursesw5-dev\nsudo apt-get install -y cmake libffi-dev libssl-dev\nsudo apt-get install -y libltdl-dev build-essential python3-dev python3-venv\nsudo apt-get install -y libnss3-dev libnss3-tools\n"
+                "run": "sudo apt-get update -y\nsudo apt-get install -y git zip unzip python3-pip autoconf libtool pkg-config\nsudo apt-get install -y zlib1g-dev libncurses5-dev libncursesw5-dev\nsudo apt-get install -y cmake libffi-dev libssl-dev\nsudo apt-get install -y libltdl-dev build-essential python3-dev python3-venv\nsudo apt-get install -y libnss3-dev libnss3-tools"
               },
               {
                 "name": "Configure pip mirror",
-                "run": "pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/\npip config set global.trusted-host mirrors.aliyun.com\n"
+                "run": "pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/\npip config set global.trusted-host mirrors.aliyun.com"
               },
               {
                 "name": "Install Python dependencies",
-                "run": "python -m pip install --upgrade pip setuptools\npip install buildozer==1.5.0 kivy==2.3.1 requests==2.25.1 cython==0.29.36 certifi\npip install python-for-android\n"
+                "run": "python -m pip install --upgrade pip setuptools\npip install buildozer==1.5.0 kivy==2.3.1 requests==2.25.1 cython==0.29.36 certifi\npip install python-for-android"
               },
               {
                 "name": "Set up Android SDK",
@@ -2366,15 +2363,11 @@
               },
               {
                 "name": "Initialize Buildozer",
-                "run": "buildozer init\ncat << 'EOF' > buildozer.spec\n[app]\ntitle = WeatherApp\npackage.name = weatherapp\npackage.domain = org.weatherapp\nsource.dir = .\nsource.include_exts = py,png,jpg,kv,atlas\nversion = 0.1\nrequirements = python3,kivy==2.3.1,requests==2.25.1,certifi\nandroid.permissions = INTERNET\nandroid.api = 34\nandroid.minapi = 21\nandroid.ndk = 25.2.9519653\nandroid.ndk_path = $ANDROID_NDK_HOME\nandroid.sdk_path = $ANDROID_HOME\nandroid.accept_sdk_license = True\norientation = portrait\nfullscreen = 0\nlog_level = 2\np4a.branch = master\nEOF\n"
+                "run": "buildozer init\ncat << 'EOF' > buildozer.spec\n[app]\ntitle = WeatherApp\npackage.name = weatherapp\npackage.domain = org.weatherapp\nsource.dir = .\nsource.include_exts = py,png,jpg,kv,atlas\nversion = 0.1\nrequirements = python3,kivy==2.3.1,requests==2.25.1,certifi\nandroid.permissions = INTERNET\nandroid.api = 34\nandroid.minapi = 21\nandroid.ndk = 25.2.9519653\nandroid.ndk_path = $ANDROID_NDK_HOME\nandroid.sdk_path = $ANDROID_HOME\nandroid.accept_sdk_license = True\norientation = portrait\nfullscreen = 0\nlog_level = 2\np4a.branch = master\nEOF"
               },
               {
                 "name": "Prepare python-for-android",
-                "run": "mkdir -p .buildozer/android/platform\ngit clone https://github.com/kivy/python-for-android.git .buildozer/android/platform/python-for-android\ncd .buildozer/android/platform/python-for-android\ngit checkout master\n"
-              },
-              {
-                "name": "Check Disk Space Before Build",
-                "run": "df -h\ndu -h /tmp -d 1 || echo '无法检查 /tmp 目录'\n"
+                "run": "mkdir -p .buildozer/android/platform\ngit clone https://github.com/kivy/python-for-android.git .buildozer/android/platform/python-for-android\ncd .buildozer/android/platform/python-for-android\ngit checkout master"
               },
               {
                 "env": {
@@ -2385,12 +2378,12 @@
                   "P4A_RELEASE_KEYSTORE_PASSWD": "${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}"
                 },
                 "name": "Build APK",
-                "run": "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\nbuildozer android clean\nbuildozer -v android debug deploy 2>&1 | tee build.log\nif [ ${PIPESTATUS[0]} -ne 0 ]; then\n  cat build.log\n  exit 1\nfi\n"
+                "run": "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\nbuildozer android clean\nbuildozer -v android debug deploy 2>&1 | tee build.log\nif [ ${PIPESTATUS[0]} -ne 0 ]; then\n  cat build.log\n  exit 1\nfi"
               },
               {
                 "if": "always()",
                 "name": "Verify Build Log",
-                "run": "if [ -f build.log ]; then\n  echo \"Build log exists, checking for errors...\"\n  if grep -q -E \"ERROR:|FAILED\" build.log; then\n    echo \"Errors found in build log:\"\n    grep -E \"ERROR:|FAILED\" build.log\n    exit 1\n  else\n    echo \"No critical errors found in build log\"\n  fi\nelse\n  echo \"No build log found\"\n  exit 1\nfi\n"
+                "run": "if [ -f build.log ]; then\n  echo \"Build log exists, checking for errors...\"\n  if grep -q -E \"ERROR:|FAILED\" build.log; then\n    echo \"Errors found in build log:\"\n    grep -E \"ERROR:|FAILED\" build.log\n    exit 1\n  else\n    echo \"No critical errors found in build log\"\n  fi\nelse\n  echo \"No build log found\"\n  exit 1\nfi"
               },
               {
                 "if": "always()",
@@ -2414,105 +2407,10 @@
                 }
               },
               {
-                "name": "Retry Android NDK Download",
-                "run": "ping -c 4 google.com || echo \"网络连接失败，请检查网络\"\nfor i in {1..3}; do\n  echo \"尝试下载 Android NDK，第 $i 次\"\n  buildozer android debug && break\n  echo \"下载失败，等待 10 秒后重试...\"\n  sleep 10\ndone\n"
-              },
-              {
-                "name": "Manually Install Android NDK",
-                "run": "wget -O android-ndk.zip https://dl.google.com/android/repository/android-ndk-r23b-linux.zip\nunzip android-ndk.zip -d $HOME/android-ndk\necho \"export ANDROID_NDK=$HOME/android-ndk/android-ndk-r23b\" >> $HOME/.bashrc\necho \"export PATH=$ANDROID_NDK:$PATH\" >> $HOME/.bashrc\nsource $HOME/.bashrc\nbuildozer android debug\n"
-              },
-              {
-                "env": {
-                  "BUILDOCZER_TIMEOUT": 600
-                },
-                "name": "Set Download Timeout",
-                "run": "export BUILDOCZER_TIMEOUT=600"
-              },
-              {
-                "name": "Verify APK Generation",
-                "run": "if [ ! -f build/outputs/apk/debug/weatherapp.apk ]; then\n  echo \"APK 未生成，重新构建\"\n  buildozer android debug\nfi\n"
-              },
-              {
-                "name": "Use Cached NDK",
-                "run": "buildozer android use_cached_ndk"
-              },
-              {
-                "name": "Verify Build Success",
-                "run": "buildozer android debug || exit 1"
-              },
-              {
-                "if": "always()",
-                "name": "Check Disk Space After Build",
-                "run": "df -h\ndu -h /tmp -d 1 || echo '无法检查 /tmp 目录'\n"
-              },
-              {
-                "env": {
-                  "DEEPSEEK_API_KEY": "${{ secrets.DEEPSEEK_API_KEY }}",
-                  "GITHUB_TOKEN": "${{ secrets.GITHUB_TOKEN }}"
-                },
-                "name": "Run Autodebug for Fixes",
-                "run": "pip install requests pyyaml python-dotenv\npython3 -m autodebug.main"
-              },
-              {
-                "name": "Fix Permissions",
-                "run": "chmod +x ./script.sh  # 根据具体文件调整\n"
-              },
-              {
-                "name": "Clean Disk Space",
-                "run": "rm -rf /tmp/* && docker system prune -a --force"
-              },
-              {
-                "name": "Clean Build Cache",
-                "run": "rm -rf ~/.buildozer/cache && buildozer android clean"
-              },
-              {
-                "name": "Force NDK Redownload",
-                "run": "rm -rf ~/.buildozer/android/platform/android-ndk-* && buildozer android debug"
-              },
-              {
-                "name": "Check Network Connectivity",
-                "run": "ping -c 4 google.com || echo '网络连接失败，请检查网络'"
-              },
-              {
-                "name": "Set Network Proxy",
-                "run": "export HTTP_PROXY=http://proxy.example.com:8080 && export HTTPS_PROXY=http://proxy.example.com:8080"
-              },
-              {
-                "name": "Retry Build",
-                "run": "buildozer android debug || buildozer android debug"
-              },
-              {
-                "name": "Clean Dependency Cache",
-                "run": "pip cache purge"
-              },
-              {
-                "name": "Update Dependencies",
-                "run": "pip install --upgrade pip setuptools kivy buildozer"
-              },
-              [
-                {
-                  "name": "Initial Trigger Step",
-                  "run": "echo 'Initial trigger to start a new workflow'"
-                }
-              ],
-              [
-                {
-                  "name": "Initial Trigger Step",
-                  "run": "echo 'Initial trigger to start a new workflow'"
-                }
-              ],
-              [
-                {
-                  "name": "Initial Trigger Step",
-                  "run": "echo 'Initial trigger to start a new workflow'"
-                }
-              ],
-              {
                 "name": "Initial Trigger Step",
                 "run": "echo 'Initial trigger to start a new workflow'"
               }
-            ],
-            "timeout-minutes": 30
+            ]
           }
         },
         "name": "WeatherApp CI",
@@ -2535,10 +2433,7 @@
       "after": {
         "jobs": {
           "build": {
-            "permissions": {
-              "contents": "write"
-            },
-            "runs-on": "ubuntu-latest",
+            "runs-on": "Ubuntu-latest",
             "steps": [
               {
                 "uses": "actions/checkout@v4"
@@ -2560,19 +2455,19 @@
               },
               {
                 "name": "Install missing libtinfo package",
-                "run": "Ubuntu_version=$(lsb_release -rs)\nif [[ \"$Ubuntu_version\" == \"22.04\" || \"$Ubuntu_version\" == \"24.04\" ]]; then\n  sudo apt-get update -y\n  sudo apt-get install -y libtinfo6\nelse\n  sudo apt-get update -y\n  sudo apt-get install -y libtinfo5\nfi\n"
+                "run": "Ubuntu_version=$(lsb_release -rs)\nif [[ \"$Ubuntu_version\" == \"22.04\" || \"$Ubuntu_version\" == \"24.04\" ]]; then\n  sudo apt-get update -y\n  sudo apt-get install -y libtinfo6\nelse\n  sudo apt-get update -y\n  sudo apt-get install -y libtinfo5\nfi"
               },
               {
                 "name": "Install system dependencies",
-                "run": "sudo apt-get update -y\nsudo apt-get install -y git zip unzip python3-pip autoconf libtool pkg-config\nsudo apt-get install -y zlib1g-dev libncurses5-dev libncursesw5-dev\nsudo apt-get install -y cmake libffi-dev libssl-dev\nsudo apt-get install -y libltdl-dev build-essential python3-dev python3-venv\nsudo apt-get install -y libnss3-dev libnss3-tools\n"
+                "run": "sudo apt-get update -y\nsudo apt-get install -y git zip unzip python3-pip autoconf libtool pkg-config\nsudo apt-get install -y zlib1g-dev libncurses5-dev libncursesw5-dev\nsudo apt-get install -y cmake libffi-dev libssl-dev\nsudo apt-get install -y libltdl-dev build-essential python3-dev python3-venv\nsudo apt-get install -y libnss3-dev libnss3-tools"
               },
               {
                 "name": "Configure pip mirror",
-                "run": "pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/\npip config set global.trusted-host mirrors.aliyun.com\n"
+                "run": "pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/\npip config set global.trusted-host mirrors.aliyun.com"
               },
               {
                 "name": "Install Python dependencies",
-                "run": "python -m pip install --upgrade pip setuptools\npip install buildozer==1.5.0 kivy==2.3.1 requests==2.25.1 cython==0.29.36 certifi\npip install python-for-android\n"
+                "run": "python -m pip install --upgrade pip setuptools\npip install buildozer==1.5.0 kivy==2.3.1 requests==2.25.1 cython==0.29.36 certifi\npip install python-for-android"
               },
               {
                 "name": "Set up Android SDK",
@@ -2585,15 +2480,11 @@
               },
               {
                 "name": "Initialize Buildozer",
-                "run": "buildozer init\ncat << 'EOF' > buildozer.spec\n[app]\ntitle = WeatherApp\npackage.name = weatherapp\npackage.domain = org.weatherapp\nsource.dir = .\nsource.include_exts = py,png,jpg,kv,atlas\nversion = 0.1\nrequirements = python3,kivy==2.3.1,requests==2.25.1,certifi\nandroid.permissions = INTERNET\nandroid.api = 34\nandroid.minapi = 21\nandroid.ndk = 25.2.9519653\nandroid.ndk_path = $ANDROID_NDK_HOME\nandroid.sdk_path = $ANDROID_HOME\nandroid.accept_sdk_license = True\norientation = portrait\nfullscreen = 0\nlog_level = 2\np4a.branch = master\nEOF\n"
+                "run": "buildozer init\ncat << 'EOF' > buildozer.spec\n[app]\ntitle = WeatherApp\npackage.name = weatherapp\npackage.domain = org.weatherapp\nsource.dir = .\nsource.include_exts = py,png,jpg,kv,atlas\nversion = 0.1\nrequirements = python3,kivy==2.3.1,requests==2.25.1,certifi\nandroid.permissions = INTERNET\nandroid.api = 34\nandroid.minapi = 21\nandroid.ndk = 25.2.9519653\nandroid.ndk_path = $ANDROID_NDK_HOME\nandroid.sdk_path = $ANDROID_HOME\nandroid.accept_sdk_license = True\norientation = portrait\nfullscreen = 0\nlog_level = 2\np4a.branch = master\nEOF"
               },
               {
                 "name": "Prepare python-for-android",
-                "run": "mkdir -p .buildozer/android/platform\ngit clone https://github.com/kivy/python-for-android.git .buildozer/android/platform/python-for-android\ncd .buildozer/android/platform/python-for-android\ngit checkout master\n"
-              },
-              {
-                "name": "Check Disk Space Before Build",
-                "run": "df -h\ndu -h /tmp -d 1 || echo '无法检查 /tmp 目录'\n"
+                "run": "mkdir -p .buildozer/android/platform\ngit clone https://github.com/kivy/python-for-android.git .buildozer/android/platform/python-for-android\ncd .buildozer/android/platform/python-for-android\ngit checkout master"
               },
               {
                 "env": {
@@ -2604,12 +2495,12 @@
                   "P4A_RELEASE_KEYSTORE_PASSWD": "${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}"
                 },
                 "name": "Build APK",
-                "run": "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\nbuildozer android clean\nbuildozer -v android debug deploy 2>&1 | tee build.log\nif [ ${PIPESTATUS[0]} -ne 0 ]; then\n  cat build.log\n  exit 1\nfi\n"
+                "run": "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\nbuildozer android clean\nbuildozer -v android debug deploy 2>&1 | tee build.log\nif [ ${PIPESTATUS[0]} -ne 0 ]; then\n  cat build.log\n  exit 1\nfi"
               },
               {
                 "if": "always()",
                 "name": "Verify Build Log",
-                "run": "if [ -f build.log ]; then\n  echo \"Build log exists, checking for errors...\"\n  if grep -q -E \"ERROR:|FAILED\" build.log; then\n    echo \"Errors found in build log:\"\n    grep -E \"ERROR:|FAILED\" build.log\n    exit 1\n  else\n    echo \"No critical errors found in build log\"\n  fi\nelse\n  echo \"No build log found\"\n  exit 1\nfi\n"
+                "run": "if [ -f build.log ]; then\n  echo \"Build log exists, checking for errors...\"\n  if grep -q -E \"ERROR:|FAILED\" build.log; then\n    echo \"Errors found in build log:\"\n    grep -E \"ERROR:|FAILED\" build.log\n    exit 1\n  else\n    echo \"No critical errors found in build log\"\n  fi\nelse\n  echo \"No build log found\"\n  exit 1\nfi"
               },
               {
                 "if": "always()",
@@ -2633,105 +2524,10 @@
                 }
               },
               {
-                "name": "Retry Android NDK Download",
-                "run": "ping -c 4 google.com || echo \"网络连接失败，请检查网络\"\nfor i in {1..3}; do\n  echo \"尝试下载 Android NDK，第 $i 次\"\n  buildozer android debug && break\n  echo \"下载失败，等待 10 秒后重试...\"\n  sleep 10\ndone\n"
-              },
-              {
-                "name": "Manually Install Android NDK",
-                "run": "wget -O android-ndk.zip https://dl.google.com/android/repository/android-ndk-r23b-linux.zip\nunzip android-ndk.zip -d $HOME/android-ndk\necho \"export ANDROID_NDK=$HOME/android-ndk/android-ndk-r23b\" >> $HOME/.bashrc\necho \"export PATH=$ANDROID_NDK:$PATH\" >> $HOME/.bashrc\nsource $HOME/.bashrc\nbuildozer android debug\n"
-              },
-              {
-                "env": {
-                  "BUILDOCZER_TIMEOUT": 600
-                },
-                "name": "Set Download Timeout",
-                "run": "export BUILDOCZER_TIMEOUT=600"
-              },
-              {
-                "name": "Verify APK Generation",
-                "run": "if [ ! -f build/outputs/apk/debug/weatherapp.apk ]; then\n  echo \"APK 未生成，重新构建\"\n  buildozer android debug\nfi\n"
-              },
-              {
-                "name": "Use Cached NDK",
-                "run": "buildozer android use_cached_ndk"
-              },
-              {
-                "name": "Verify Build Success",
-                "run": "buildozer android debug || exit 1"
-              },
-              {
-                "if": "always()",
-                "name": "Check Disk Space After Build",
-                "run": "df -h\ndu -h /tmp -d 1 || echo '无法检查 /tmp 目录'\n"
-              },
-              {
-                "env": {
-                  "DEEPSEEK_API_KEY": "${{ secrets.DEEPSEEK_API_KEY }}",
-                  "GITHUB_TOKEN": "${{ secrets.GITHUB_TOKEN }}"
-                },
-                "name": "Run Autodebug for Fixes",
-                "run": "pip install requests pyyaml python-dotenv\npython3 -m autodebug.main"
-              },
-              {
-                "name": "Fix Permissions",
-                "run": "chmod +x ./script.sh  # 根据具体文件调整\n"
-              },
-              {
-                "name": "Clean Disk Space",
-                "run": "rm -rf /tmp/* && docker system prune -a --force"
-              },
-              {
-                "name": "Clean Build Cache",
-                "run": "rm -rf ~/.buildozer/cache && buildozer android clean"
-              },
-              {
-                "name": "Force NDK Redownload",
-                "run": "rm -rf ~/.buildozer/android/platform/android-ndk-* && buildozer android debug"
-              },
-              {
-                "name": "Check Network Connectivity",
-                "run": "ping -c 4 google.com || echo '网络连接失败，请检查网络'"
-              },
-              {
-                "name": "Set Network Proxy",
-                "run": "export HTTP_PROXY=http://proxy.example.com:8080 && export HTTPS_PROXY=http://proxy.example.com:8080"
-              },
-              {
-                "name": "Retry Build",
-                "run": "buildozer android debug || buildozer android debug"
-              },
-              {
-                "name": "Clean Dependency Cache",
-                "run": "pip cache purge"
-              },
-              {
-                "name": "Update Dependencies",
-                "run": "pip install --upgrade pip setuptools kivy buildozer"
-              },
-              [
-                {
-                  "name": "Initial Trigger Step",
-                  "run": "echo 'Initial trigger to start a new workflow'"
-                }
-              ],
-              [
-                {
-                  "name": "Initial Trigger Step",
-                  "run": "echo 'Initial trigger to start a new workflow'"
-                }
-              ],
-              [
-                {
-                  "name": "Initial Trigger Step",
-                  "run": "echo 'Initial trigger to start a new workflow'"
-                }
-              ],
-              {
                 "name": "Initial Trigger Step",
                 "run": "echo 'Initial trigger to start a new workflow'"
               }
-            ],
-            "timeout-minutes": 30
+            ]
           }
         },
         "name": "WeatherApp CI",
