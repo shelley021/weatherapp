@@ -13,6 +13,8 @@ jobs:
     runs-on: Ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    - name: Check network connectivity
+      run: ping -c 4 google.com || echo "Network check failed, continuing anyway"
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
@@ -206,4 +208,4 @@ jobs:
         path: bin/weatherapp-*.apk
         retention-days: 1
 
-# AutoDebug: Forced change at 2025-05-08T07:56:13.269478+00:00
+# AutoDebug: Forced change at 2025-05-08T08:02:22.871280+00:00
