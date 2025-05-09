@@ -78,5 +78,6 @@
   ],
   "successful_fix": "DeepSeek API fix with auto-supplemented steps",
   "timestamp": "2025-05-09T13:42:15.371760",
-  "successful_steps": []
+  "successful_steps": [],
+  "known_errors": []
 }
