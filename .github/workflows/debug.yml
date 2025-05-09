@@ -1,3 +1,13 @@
+name: WeatherApp CI
+'on':
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: Ubuntu-latest
@@ -134,19 +144,5 @@ jobs:
         retention-days: 1
     - name: Initial Trigger Step
       run: echo 'Initial trigger to start a new workflow'
-name: WeatherApp CI
-'on':
-  pull_request:
-    branches:
-    - main
-  push:
-    branches:
-    - main
-permissions:
-  contents: write
 
-# AutoDebug: Forced change at 2025-05-08T08:43:35.234244+00:00
-
-# AutoDebug: Forced change at 2025-05-08T09:00:50.978075+00:00
-
-# AutoDebug: Forced change at 2025-05-08T09:10:42.016544+00:00
+# AutoDebug: Forced change at 2025-05-09T01:57:26.213004+00:00

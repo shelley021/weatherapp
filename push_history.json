@@ -3319,25 +3319,9 @@
     }
   },
   "AutoDebug: Force push debug.yml to trigger new workflow": {
-    "timestamp": "2025-05-08T03:28:23.924825+00:00",
+    "timestamp": "2025-05-08T09:10:43.859567+00:00",
     "changes": {
       "before": {
-        "name": "WeatherApp CI",
-        "on": {
-          "push": {
-            "branches": [
-              "main"
-            ]
-          },
-          "pull_request": {
-            "branches": [
-              "main"
-            ]
-          }
-        },
-        "permissions": {
-          "contents": "write"
-        },
         "jobs": {
           "build": {
             "runs-on": "Ubuntu-latest",
@@ -3436,25 +3420,25 @@
               }
             ]
           }
+        },
+        "name": "WeatherApp CI",
+        "on": {
+          "pull_request": {
+            "branches": [
+              "main"
+            ]
+          },
+          "push": {
+            "branches": [
+              "main"
+            ]
+          }
+        },
+        "permissions": {
+          "contents": "write"
         }
       },
       "after": {
-        "name": "WeatherApp CI",
-        "on": {
-          "push": {
-            "branches": [
-              "main"
-            ]
-          },
-          "pull_request": {
-            "branches": [
-              "main"
-            ]
-          }
-        },
-        "permissions": {
-          "contents": "write"
-        },
         "jobs": {
           "build": {
             "runs-on": "Ubuntu-latest",
@@ -3553,6 +3537,22 @@
               }
             ]
           }
+        },
+        "name": "WeatherApp CI",
+        "on": {
+          "pull_request": {
+            "branches": [
+              "main"
+            ]
+          },
+          "push": {
+            "branches": [
+              "main"
+            ]
+          }
+        },
+        "permissions": {
+          "contents": "write"
         }
       },
       "description": "Initial trigger push"
