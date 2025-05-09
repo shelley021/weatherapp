@@ -3319,9 +3319,25 @@
     }
   },
   "AutoDebug: Force push debug.yml to trigger new workflow": {
-    "timestamp": "2025-05-09T06:01:20.936956+00:00",
+    "timestamp": "2025-05-09T06:05:16.727724+00:00",
     "changes": {
       "before": {
+        "name": "WeatherApp CI",
+        "true": {
+          "pull_request": {
+            "branches": [
+              "main"
+            ]
+          },
+          "push": {
+            "branches": [
+              "main"
+            ]
+          }
+        },
+        "permissions": {
+          "contents": "write"
+        },
         "jobs": {
           "build": {
             "runs-on": "Ubuntu-latest",
@@ -3398,7 +3414,7 @@
                 "if": "always()",
                 "uses": "actions/upload-artifact@v4",
                 "with": {
-                  "name": "build-log",
+                  "name": "build-log-None",
                   "path": "build.log",
                   "retention-days": 1
                 }
@@ -3409,36 +3425,63 @@
                 "uses": "actions/upload-artifact@v4",
                 "with": {
                   "if-no-files-found": "error",
-                  "name": "weatherapp-apk",
+                  "name": "weatherapp-apk-None",
                   "path": "bin/weatherapp-*.apk",
                   "retention-days": 1
                 }
               },
               {
-                "name": "Initial Trigger Step",
-                "run": "echo 'Initial trigger to start a new workflow'"
+                "name": "Check network connectivity",
+                "run": "echo \"Checking network connectivity...\"\nping -c 4 google.com || echo \"Network check failed\"\n"
+              },
+              {
+                "name": "Clean build cache",
+                "run": "rm -rf ~/.buildozer/cache\nbuildozer android clean\n"
+              },
+              {
+                "name": "Build APK with retry",
+                "env": {
+                  "OPENWEATHER_API_KEY": "${{ secrets.OPENWEATHER_API_KEY }}",
+                  "P4A_RELEASE_KEYALIAS": "${{ secrets.P4A_RELEASE_KEYALIAS }}",
+                  "P4A_RELEASE_KEYALIAS_PASSWD": "${{ secrets.P4A_RELEASE_KEYALIAS_PASSWD }}",
+                  "P4A_RELEASE_KEYSTORE": "${{ secrets.P4A_RELEASE_KEYSTORE }}",
+                  "P4A_RELEASE_KEYSTORE_PASSWD": "${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}"
+                },
+                "run": "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\n\n# Try build with retry logic\nfor i in {1..3}; do\n  echo \"Attempt $i to build APK...\"\n  buildozer -v android debug deploy 2>&1 | tee build.log\n  if [ ${PIPESTATUS[0]} -eq 0 ]; then\n    echo \"Build succeeded on attempt $i\"\n    break\n  else\n    echo \"Build failed on attempt $i, retrying after 10 seconds...\"\n    sleep 10\n    if [ $i -eq 3 ]; then\n      echo \"All build attempts failed\"\n      cat build.log\n      exit 1\n    fi\n  fi\ndone\n"
               }
             ]
           }
         },
-        "name": "WeatherApp CI",
         "on": {
-          "pull_request": {
-            "branches": [
-              "main"
-            ]
-          },
           "push": {
             "branches": [
               "main"
             ]
+          },
+          "pull_request": {
+            "branches": [
+              "main"
+            ]
           }
-        },
-        "permissions": {
-          "contents": "write"
         }
       },
       "after": {
+        "name": "WeatherApp CI",
+        "true": {
+          "pull_request": {
+            "branches": [
+              "main"
+            ]
+          },
+          "push": {
+            "branches": [
+              "main"
+            ]
+          }
+        },
+        "permissions": {
+          "contents": "write"
+        },
         "jobs": {
           "build": {
             "runs-on": "Ubuntu-latest",
@@ -3515,7 +3558,7 @@
                 "if": "always()",
                 "uses": "actions/upload-artifact@v4",
                 "with": {
-                  "name": "build-log",
+                  "name": "build-log-None",
                   "path": "build.log",
                   "retention-days": 1
                 }
@@ -3526,33 +3569,44 @@
                 "uses": "actions/upload-artifact@v4",
                 "with": {
                   "if-no-files-found": "error",
-                  "name": "weatherapp-apk",
+                  "name": "weatherapp-apk-None",
                   "path": "bin/weatherapp-*.apk",
                   "retention-days": 1
                 }
               },
               {
-                "name": "Initial Trigger Step",
-                "run": "echo 'Initial trigger to start a new workflow'"
+                "name": "Check network connectivity",
+                "run": "echo \"Checking network connectivity...\"\nping -c 4 google.com || echo \"Network check failed\"\n"
+              },
+              {
+                "name": "Clean build cache",
+                "run": "rm -rf ~/.buildozer/cache\nbuildozer android clean\n"
+              },
+              {
+                "name": "Build APK with retry",
+                "env": {
+                  "OPENWEATHER_API_KEY": "${{ secrets.OPENWEATHER_API_KEY }}",
+                  "P4A_RELEASE_KEYALIAS": "${{ secrets.P4A_RELEASE_KEYALIAS }}",
+                  "P4A_RELEASE_KEYALIAS_PASSWD": "${{ secrets.P4A_RELEASE_KEYALIAS_PASSWD }}",
+                  "P4A_RELEASE_KEYSTORE": "${{ secrets.P4A_RELEASE_KEYSTORE }}",
+                  "P4A_RELEASE_KEYSTORE_PASSWD": "${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}"
+                },
+                "run": "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\n\n# Try build with retry logic\nfor i in {1..3}; do\n  echo \"Attempt $i to build APK...\"\n  buildozer -v android debug deploy 2>&1 | tee build.log\n  if [ ${PIPESTATUS[0]} -eq 0 ]; then\n    echo \"Build succeeded on attempt $i\"\n    break\n  else\n    echo \"Build failed on attempt $i, retrying after 10 seconds...\"\n    sleep 10\n    if [ $i -eq 3 ]; then\n      echo \"All build attempts failed\"\n      cat build.log\n      exit 1\n    fi\n  fi\ndone\n"
               }
             ]
           }
         },
-        "name": "WeatherApp CI",
         "on": {
-          "pull_request": {
-            "branches": [
-              "main"
-            ]
-          },
           "push": {
             "branches": [
               "main"
             ]
+          },
+          "pull_request": {
+            "branches": [
+              "main"
+            ]
           }
-        },
-        "permissions": {
-          "contents": "write"
         }
       },
       "description": "Initial trigger push"
