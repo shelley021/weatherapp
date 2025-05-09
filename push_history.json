@@ -3319,9 +3319,25 @@
     }
   },
   "AutoDebug: Force push debug.yml to trigger new workflow": {
-    "timestamp": "2025-05-08T09:10:43.859567+00:00",
+    "timestamp": "2025-05-09T05:18:26.702176+00:00",
     "changes": {
       "before": {
+        "name": "WeatherApp CI",
+        "true": {
+          "pull_request": {
+            "branches": [
+              "main"
+            ]
+          },
+          "push": {
+            "branches": [
+              "main"
+            ]
+          }
+        },
+        "permissions": {
+          "contents": "write"
+        },
         "jobs": {
           "build": {
             "runs-on": "Ubuntu-latest",
@@ -3346,19 +3362,19 @@
               },
               {
                 "name": "Install missing libtinfo package",
-                "run": "Ubuntu_version=$(lsb_release -rs)\nif [[ \"$Ubuntu_version\" == \"22.04\" || \"$Ubuntu_version\" == \"24.04\" ]]; then\n  sudo apt-get update -y\n  sudo apt-get install -y libtinfo6\nelse\n  sudo apt-get update -y\n  sudo apt-get install -y libtinfo5\nfi"
+                "run": "Ubuntu_version=$(lsb_release -rs)\nif [[ \"$Ubuntu_version\" == \"22.04\" || \"$Ubuntu_version\" == \"24.04\" ]]; then\n  sudo apt-get update -y\n  sudo apt-get install -y libtinfo6\nelse\n  sudo apt-get update -y\n  sudo apt-get install -y libtinfo5\nfi\n"
               },
               {
                 "name": "Install system dependencies",
-                "run": "sudo apt-get update -y\nsudo apt-get install -y git zip unzip python3-pip autoconf libtool pkg-config\nsudo apt-get install -y zlib1g-dev libncurses5-dev libncursesw5-dev\nsudo apt-get install -y cmake libffi-dev libssl-dev\nsudo apt-get install -y libltdl-dev build-essential python3-dev python3-venv\nsudo apt-get install -y libnss3-dev libnss3-tools"
+                "run": "sudo apt-get update -y\nsudo apt-get install -y git zip unzip python3-pip autoconf libtool pkg-config\nsudo apt-get install -y zlib1g-dev libncurses5-dev libncursesw5-dev\nsudo apt-get install -y cmake libffi-dev libssl-dev\nsudo apt-get install -y libltdl-dev build-essential python3-dev python3-venv\nsudo apt-get install -y libnss3-dev libnss3-tools\n"
               },
               {
                 "name": "Configure pip mirror",
-                "run": "pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/\npip config set global.trusted-host mirrors.aliyun.com"
+                "run": "pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/\npip config set global.trusted-host mirrors.aliyun.com\n"
               },
               {
                 "name": "Install Python dependencies",
-                "run": "python -m pip install --upgrade pip setuptools\npip install buildozer==1.5.0 kivy==2.3.1 requests==2.25.1 cython==0.29.36 certifi\npip install python-for-android"
+                "run": "python -m pip install --upgrade pip setuptools\npip install buildozer==1.5.0 kivy==2.3.1 requests==2.25.1 cython==0.29.36 certifi\npip install python-for-android\n"
               },
               {
                 "name": "Set up Android SDK",
@@ -3371,11 +3387,65 @@
               },
               {
                 "name": "Initialize Buildozer",
-                "run": "buildozer init\ncat << 'EOF' > buildozer.spec\n[app]\ntitle = WeatherApp\npackage.name = weatherapp\npackage.domain = org.weatherapp\nsource.dir = .\nsource.include_exts = py,png,jpg,kv,atlas\nversion = 0.1\nrequirements = python3,kivy==2.3.1,requests==2.25.1,certifi\nandroid.permissions = INTERNET\nandroid.api = 34\nandroid.minapi = 21\nandroid.ndk = 25.2.9519653\nandroid.ndk_path = $ANDROID_NDK_HOME\nandroid.sdk_path = $ANDROID_HOME\nandroid.accept_sdk_license = True\norientation = portrait\nfullscreen = 0\nlog_level = 2\np4a.branch = master\nEOF"
+                "run": "buildozer init\ncat << 'EOF' > buildozer.spec\n[app]\ntitle = WeatherApp\npackage.name = weatherapp\npackage.domain = org.weatherapp\nsource.dir = .\nsource.include_exts = py,png,jpg,kv,atlas\nversion = 0.1\nrequirements = python3,kivy==2.3.1,requests==2.25.1,certifi\nandroid.permissions = INTERNET\nandroid.api = 34\nandroid.minapi = 21\nandroid.ndk = 25.2.9519653\nandroid.ndk_path = $ANDROID_NDK_HOME\nandroid.sdk_path = $ANDROID_HOME\nandroid.accept_sdk_license = True\norientation = portrait\nfullscreen = 0\nlog_level = 2\np4a.branch = master\nEOF\n"
               },
               {
                 "name": "Prepare python-for-android",
-                "run": "mkdir -p .buildozer/android/platform\ngit clone https://github.com/kivy/python-for-android.git .buildozer/android/platform/python-for-android\ncd .buildozer/android/platform/python-for-android\ngit checkout master"
+                "run": "mkdir -p .buildozer/android/platform\ngit clone https://github.com/kivy/python-for-android.git .buildozer/android/platform/python-for-android\ncd .buildozer/android/platform/python-for-android\ngit checkout master\n"
+              },
+              {
+                "name": "Clean build cache",
+                "run": "rm -rf ~/.buildozer/cache\nbuildozer android clean\n"
+              },
+              {
+                "name": "Build APK with retry",
+                "env": {
+                  "OPENWEATHER_API_KEY": "${{ secrets.OPENWEATHER_API_KEY }}",
+                  "P4A_RELEASE_KEYALIAS": "${{ secrets.P4A_RELEASE_KEYALIAS }}",
+                  "P4A_RELEASE_KEYALIAS_PASSWD": "${{ secrets.P4A_RELEASE_KEYALIAS_PASSWD }}",
+                  "P4A_RELEASE_KEYSTORE": "${{ secrets.P4A_RELEASE_KEYSTORE }}",
+                  "P4A_RELEASE_KEYSTORE_PASSWD": "${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}"
+                },
+                "run": "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\n\n# Retry build up to 3 times if failed\nfor i in {1..3}; do\n  echo \"Attempt $i to build APK...\"\n  buildozer -v android debug deploy 2>&1 | tee build.log\n  if [ ${PIPESTATUS[0]} -eq 0 ]; then\n    echo \"Build succeeded on attempt $i\"\n    break\n  else\n    echo \"Build failed on attempt $i\"\n    if [ $i -lt 3 ]; then\n      echo \"Waiting 30 seconds before retry...\"\n      sleep 30\n    else\n      echo \"All build attempts failed\"\n      cat build.log\n      exit 1\n    fi\n  fi\ndone\n"
+              },
+              {
+                "name": "Verify Build Log",
+                "if": "always()",
+                "run": "if [ -f build.log ]; then\n  echo \"Build log exists, checking for errors...\"\n  if grep -q -E \"ERROR:|FAILED\" build.log; then\n    echo \"Errors found in build log:\"\n    grep -E \"ERROR:|FAILED\" build.log\n    exit 1\n  else\n    echo \"No critical errors found in build log\"\n  fi\nelse\n  echo \"No build log found\"\n  exit 1\nfi\n"
+              },
+              {
+                "name": "Save Build Log",
+                "if": "always()",
+                "uses": "actions/upload-artifact@v4",
+                "with": {
+                  "name": "build-log-None",
+                  "path": "build.log",
+                  "retention-days": 1
+                }
+              },
+              {
+                "name": "Set up JDK 17",
+                "uses": "actions/setup-java@v3",
+                "with": {
+                  "distribution": "temurin",
+                  "java-version": "17"
+                }
+              },
+              {
+                "name": "Set up Python",
+                "uses": "actions/setup-python@v5",
+                "with": {
+                  "python-version": "3.10"
+                }
+              },
+              {
+                "name": "Set up Android SDK",
+                "uses": "android-actions/setup-android@v3",
+                "with": {
+                  "accept-android-sdk-licenses": true,
+                  "cmdline-tools-version": "latest",
+                  "packages": "build-tools;34.0.0 platform-tools platforms;android-34 ndk;25.2.9519653"
+                }
               },
               {
                 "name": "Build APK",
@@ -3389,16 +3459,11 @@
                 "run": "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\nbuildozer android clean\nbuildozer -v android debug deploy 2>&1 | tee build.log\nif [ ${PIPESTATUS[0]} -ne 0 ]; then\n  cat build.log\n  exit 1\nfi"
               },
               {
-                "name": "Verify Build Log",
-                "if": "always()",
-                "run": "if [ -f build.log ]; then\n  echo \"Build log exists, checking for errors...\"\n  if grep -q -E \"ERROR:|FAILED\" build.log; then\n    echo \"Errors found in build log:\"\n    grep -E \"ERROR:|FAILED\" build.log\n    exit 1\n  else\n    echo \"No critical errors found in build log\"\n  fi\nelse\n  echo \"No build log found\"\n  exit 1\nfi"
-              },
-              {
                 "name": "Save Build Log",
                 "if": "always()",
                 "uses": "actions/upload-artifact@v4",
                 "with": {
-                  "name": "build-log",
+                  "name": "build-log-None",
                   "path": "build.log",
                   "retention-days": 1
                 }
@@ -3409,36 +3474,44 @@
                 "uses": "actions/upload-artifact@v4",
                 "with": {
                   "if-no-files-found": "error",
-                  "name": "weatherapp-apk",
+                  "name": "weatherapp-apk-None",
                   "path": "bin/weatherapp-*.apk",
                   "retention-days": 1
                 }
-              },
-              {
-                "name": "Initial Trigger Step",
-                "run": "echo 'Initial trigger to start a new workflow'"
               }
             ]
           }
         },
-        "name": "WeatherApp CI",
         "on": {
-          "pull_request": {
-            "branches": [
-              "main"
-            ]
-          },
           "push": {
             "branches": [
               "main"
             ]
+          },
+          "pull_request": {
+            "branches": [
+              "main"
+            ]
           }
-        },
-        "permissions": {
-          "contents": "write"
         }
       },
       "after": {
+        "name": "WeatherApp CI",
+        "true": {
+          "pull_request": {
+            "branches": [
+              "main"
+            ]
+          },
+          "push": {
+            "branches": [
+              "main"
+            ]
+          }
+        },
+        "permissions": {
+          "contents": "write"
+        },
         "jobs": {
           "build": {
             "runs-on": "Ubuntu-latest",
@@ -3463,19 +3536,19 @@
               },
               {
                 "name": "Install missing libtinfo package",
-                "run": "Ubuntu_version=$(lsb_release -rs)\nif [[ \"$Ubuntu_version\" == \"22.04\" || \"$Ubuntu_version\" == \"24.04\" ]]; then\n  sudo apt-get update -y\n  sudo apt-get install -y libtinfo6\nelse\n  sudo apt-get update -y\n  sudo apt-get install -y libtinfo5\nfi"
+                "run": "Ubuntu_version=$(lsb_release -rs)\nif [[ \"$Ubuntu_version\" == \"22.04\" || \"$Ubuntu_version\" == \"24.04\" ]]; then\n  sudo apt-get update -y\n  sudo apt-get install -y libtinfo6\nelse\n  sudo apt-get update -y\n  sudo apt-get install -y libtinfo5\nfi\n"
               },
               {
                 "name": "Install system dependencies",
-                "run": "sudo apt-get update -y\nsudo apt-get install -y git zip unzip python3-pip autoconf libtool pkg-config\nsudo apt-get install -y zlib1g-dev libncurses5-dev libncursesw5-dev\nsudo apt-get install -y cmake libffi-dev libssl-dev\nsudo apt-get install -y libltdl-dev build-essential python3-dev python3-venv\nsudo apt-get install -y libnss3-dev libnss3-tools"
+                "run": "sudo apt-get update -y\nsudo apt-get install -y git zip unzip python3-pip autoconf libtool pkg-config\nsudo apt-get install -y zlib1g-dev libncurses5-dev libncursesw5-dev\nsudo apt-get install -y cmake libffi-dev libssl-dev\nsudo apt-get install -y libltdl-dev build-essential python3-dev python3-venv\nsudo apt-get install -y libnss3-dev libnss3-tools\n"
               },
               {
                 "name": "Configure pip mirror",
-                "run": "pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/\npip config set global.trusted-host mirrors.aliyun.com"
+                "run": "pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/\npip config set global.trusted-host mirrors.aliyun.com\n"
               },
               {
                 "name": "Install Python dependencies",
-                "run": "python -m pip install --upgrade pip setuptools\npip install buildozer==1.5.0 kivy==2.3.1 requests==2.25.1 cython==0.29.36 certifi\npip install python-for-android"
+                "run": "python -m pip install --upgrade pip setuptools\npip install buildozer==1.5.0 kivy==2.3.1 requests==2.25.1 cython==0.29.36 certifi\npip install python-for-android\n"
               },
               {
                 "name": "Set up Android SDK",
@@ -3488,11 +3561,65 @@
               },
               {
                 "name": "Initialize Buildozer",
-                "run": "buildozer init\ncat << 'EOF' > buildozer.spec\n[app]\ntitle = WeatherApp\npackage.name = weatherapp\npackage.domain = org.weatherapp\nsource.dir = .\nsource.include_exts = py,png,jpg,kv,atlas\nversion = 0.1\nrequirements = python3,kivy==2.3.1,requests==2.25.1,certifi\nandroid.permissions = INTERNET\nandroid.api = 34\nandroid.minapi = 21\nandroid.ndk = 25.2.9519653\nandroid.ndk_path = $ANDROID_NDK_HOME\nandroid.sdk_path = $ANDROID_HOME\nandroid.accept_sdk_license = True\norientation = portrait\nfullscreen = 0\nlog_level = 2\np4a.branch = master\nEOF"
+                "run": "buildozer init\ncat << 'EOF' > buildozer.spec\n[app]\ntitle = WeatherApp\npackage.name = weatherapp\npackage.domain = org.weatherapp\nsource.dir = .\nsource.include_exts = py,png,jpg,kv,atlas\nversion = 0.1\nrequirements = python3,kivy==2.3.1,requests==2.25.1,certifi\nandroid.permissions = INTERNET\nandroid.api = 34\nandroid.minapi = 21\nandroid.ndk = 25.2.9519653\nandroid.ndk_path = $ANDROID_NDK_HOME\nandroid.sdk_path = $ANDROID_HOME\nandroid.accept_sdk_license = True\norientation = portrait\nfullscreen = 0\nlog_level = 2\np4a.branch = master\nEOF\n"
               },
               {
                 "name": "Prepare python-for-android",
-                "run": "mkdir -p .buildozer/android/platform\ngit clone https://github.com/kivy/python-for-android.git .buildozer/android/platform/python-for-android\ncd .buildozer/android/platform/python-for-android\ngit checkout master"
+                "run": "mkdir -p .buildozer/android/platform\ngit clone https://github.com/kivy/python-for-android.git .buildozer/android/platform/python-for-android\ncd .buildozer/android/platform/python-for-android\ngit checkout master\n"
+              },
+              {
+                "name": "Clean build cache",
+                "run": "rm -rf ~/.buildozer/cache\nbuildozer android clean\n"
+              },
+              {
+                "name": "Build APK with retry",
+                "env": {
+                  "OPENWEATHER_API_KEY": "${{ secrets.OPENWEATHER_API_KEY }}",
+                  "P4A_RELEASE_KEYALIAS": "${{ secrets.P4A_RELEASE_KEYALIAS }}",
+                  "P4A_RELEASE_KEYALIAS_PASSWD": "${{ secrets.P4A_RELEASE_KEYALIAS_PASSWD }}",
+                  "P4A_RELEASE_KEYSTORE": "${{ secrets.P4A_RELEASE_KEYSTORE }}",
+                  "P4A_RELEASE_KEYSTORE_PASSWD": "${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}"
+                },
+                "run": "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\n\n# Retry build up to 3 times if failed\nfor i in {1..3}; do\n  echo \"Attempt $i to build APK...\"\n  buildozer -v android debug deploy 2>&1 | tee build.log\n  if [ ${PIPESTATUS[0]} -eq 0 ]; then\n    echo \"Build succeeded on attempt $i\"\n    break\n  else\n    echo \"Build failed on attempt $i\"\n    if [ $i -lt 3 ]; then\n      echo \"Waiting 30 seconds before retry...\"\n      sleep 30\n    else\n      echo \"All build attempts failed\"\n      cat build.log\n      exit 1\n    fi\n  fi\ndone\n"
+              },
+              {
+                "name": "Verify Build Log",
+                "if": "always()",
+                "run": "if [ -f build.log ]; then\n  echo \"Build log exists, checking for errors...\"\n  if grep -q -E \"ERROR:|FAILED\" build.log; then\n    echo \"Errors found in build log:\"\n    grep -E \"ERROR:|FAILED\" build.log\n    exit 1\n  else\n    echo \"No critical errors found in build log\"\n  fi\nelse\n  echo \"No build log found\"\n  exit 1\nfi\n"
+              },
+              {
+                "name": "Save Build Log",
+                "if": "always()",
+                "uses": "actions/upload-artifact@v4",
+                "with": {
+                  "name": "build-log-None",
+                  "path": "build.log",
+                  "retention-days": 1
+                }
+              },
+              {
+                "name": "Set up JDK 17",
+                "uses": "actions/setup-java@v3",
+                "with": {
+                  "distribution": "temurin",
+                  "java-version": "17"
+                }
+              },
+              {
+                "name": "Set up Python",
+                "uses": "actions/setup-python@v5",
+                "with": {
+                  "python-version": "3.10"
+                }
+              },
+              {
+                "name": "Set up Android SDK",
+                "uses": "android-actions/setup-android@v3",
+                "with": {
+                  "accept-android-sdk-licenses": true,
+                  "cmdline-tools-version": "latest",
+                  "packages": "build-tools;34.0.0 platform-tools platforms;android-34 ndk;25.2.9519653"
+                }
               },
               {
                 "name": "Build APK",
@@ -3506,16 +3633,11 @@
                 "run": "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\nbuildozer android clean\nbuildozer -v android debug deploy 2>&1 | tee build.log\nif [ ${PIPESTATUS[0]} -ne 0 ]; then\n  cat build.log\n  exit 1\nfi"
               },
               {
-                "name": "Verify Build Log",
-                "if": "always()",
-                "run": "if [ -f build.log ]; then\n  echo \"Build log exists, checking for errors...\"\n  if grep -q -E \"ERROR:|FAILED\" build.log; then\n    echo \"Errors found in build log:\"\n    grep -E \"ERROR:|FAILED\" build.log\n    exit 1\n  else\n    echo \"No critical errors found in build log\"\n  fi\nelse\n  echo \"No build log found\"\n  exit 1\nfi"
-              },
-              {
                 "name": "Save Build Log",
                 "if": "always()",
                 "uses": "actions/upload-artifact@v4",
                 "with": {
-                  "name": "build-log",
+                  "name": "build-log-None",
                   "path": "build.log",
                   "retention-days": 1
                 }
@@ -3526,33 +3648,25 @@
                 "uses": "actions/upload-artifact@v4",
                 "with": {
                   "if-no-files-found": "error",
-                  "name": "weatherapp-apk",
+                  "name": "weatherapp-apk-None",
                   "path": "bin/weatherapp-*.apk",
                   "retention-days": 1
                 }
-              },
-              {
-                "name": "Initial Trigger Step",
-                "run": "echo 'Initial trigger to start a new workflow'"
               }
             ]
           }
         },
-        "name": "WeatherApp CI",
         "on": {
-          "pull_request": {
-            "branches": [
-              "main"
-            ]
-          },
           "push": {
             "branches": [
               "main"
             ]
+          },
+          "pull_request": {
+            "branches": [
+              "main"
+            ]
           }
-        },
-        "permissions": {
-          "contents": "write"
         }
       },
       "description": "Initial trigger push"
