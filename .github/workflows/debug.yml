@@ -1,9 +1,9 @@
 name: WeatherApp CI
 true:
-  pull_request:
+  push:
     branches:
     - main
-  push:
+  pull_request:
     branches:
     - main
 permissions:
@@ -206,4 +206,4 @@ jobs:
     branches:
     - main
 
-# AutoDebug: Forced change at 2025-05-09T05:27:12.656687+00:00
+# AutoDebug: Forced change at 2025-05-09T05:42:15.381997+00:00
