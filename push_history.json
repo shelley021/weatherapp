@@ -3559,7 +3559,7 @@
     }
   },
   "AutoDebug: Apply DeepSeek API fix for APK generation": {
-    "timestamp": "2025-05-08T07:58:48.562395+00:00",
+    "timestamp": "2025-05-09T04:44:52.256182+00:00",
     "changes": {
       "before": {
         "name": "WeatherApp CI",
@@ -3613,8 +3613,8 @@
                 "run": "pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/\npip config set global.trusted-host mirrors.aliyun.com\n"
               },
               {
-                "name": "Install Python dependencies with retry",
-                "run": "python -m pip install --upgrade pip setuptools || sleep 10 && python -m pip install --upgrade pip setuptools\npip install buildozer==1.5.0 kivy==2.3.1 requests==2.25.1 cython==0.29.36 certifi || sleep 10 && pip install buildozer==1.5.0 kivy==2.3.1 requests==2.25.1 cython==0.29.36 certifi\npip install python-for-android || sleep 10 && pip install python-for-android\n"
+                "name": "Install Python dependencies",
+                "run": "python -m pip install --upgrade pip setuptools\npip install buildozer==1.5.0 kivy==2.3.1 requests==2.25.1 cython==0.29.36 certifi\npip install python-for-android\n"
               },
               {
                 "name": "Set up Android SDK",
@@ -3626,10 +3626,6 @@
                 }
               },
               {
-                "name": "Clean build environment",
-                "run": "rm -rf ~/.buildozer/cache\ndf -h\ndu -h /tmp -d 1 --exclude=/tmp/systemd-private-* --exclude=/tmp/snap-private-tmp 2>/dev/null || true\n"
-              },
-              {
                 "name": "Initialize Buildozer",
                 "run": "buildozer init\ncat << 'EOF' > buildozer.spec\n[app]\ntitle = WeatherApp\npackage.name = weatherapp\npackage.domain = org.weatherapp\nsource.dir = .\nsource.include_exts = py,png,jpg,kv,atlas\nversion = 0.1\nrequirements = python3,kivy==2.3.1,requests==2.25.1,certifi\nandroid.permissions = INTERNET\nandroid.api = 34\nandroid.minapi = 21\nandroid.ndk = 25.2.9519653\nandroid.ndk_path = $ANDROID_NDK_HOME\nandroid.sdk_path = $ANDROID_HOME\nandroid.accept_sdk_license = True\norientation = portrait\nfullscreen = 0\nlog_level = 2\np4a.branch = master\nEOF\n"
               },
@@ -3638,7 +3634,11 @@
                 "run": "mkdir -p .buildozer/android/platform\ngit clone https://github.com/kivy/python-for-android.git .buildozer/android/platform/python-for-android\ncd .buildozer/android/platform/python-for-android\ngit checkout master\n"
               },
               {
-                "name": "Build APK with retry",
+                "name": "Clean build cache",
+                "run": "rm -rf ~/.buildozer/cache\nbuildozer android clean\n"
+              },
+              {
+                "name": "Build APK",
                 "env": {
                   "OPENWEATHER_API_KEY": "${{ secrets.OPENWEATHER_API_KEY }}",
                   "P4A_RELEASE_KEYALIAS": "${{ secrets.P4A_RELEASE_KEYALIAS }}",
@@ -3646,7 +3646,7 @@
                   "P4A_RELEASE_KEYSTORE": "${{ secrets.P4A_RELEASE_KEYSTORE }}",
                   "P4A_RELEASE_KEYSTORE_PASSWD": "${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}"
                 },
-                "run": "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\nbuildozer android clean\nbuildozer -v android debug deploy 2>&1 | tee build.log || (sleep 30 && buildozer -v android debug deploy 2>&1 | tee build.log)\nif [ ${PIPESTATUS[0]} -ne 0 ]; then\n  cat build.log\n  exit 1\nfi\n"
+                "run": "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\nbuildozer -v android debug deploy 2>&1 | tee build.log || (sleep 30 && buildozer -v android debug deploy 2>&1 | tee build.log)\nif [ ${PIPESTATUS[0]} -ne 0 ]; then\n  cat build.log\n  exit 1\nfi\n"
               },
               {
                 "name": "Verify Build Log",
@@ -3679,10 +3679,6 @@
                 }
               },
               {
-                "name": "Install Python dependencies",
-                "run": "python -m pip install --upgrade pip setuptools\npip install buildozer==1.5.0 kivy==2.3.1 requests==2.25.1 cython==0.29.36 certifi\npip install python-for-android"
-              },
-              {
                 "name": "Set up Android SDK",
                 "uses": "android-actions/setup-android@v3",
                 "with": {
@@ -3690,17 +3686,6 @@
                   "cmdline-tools-version": "latest",
                   "packages": "build-tools;34.0.0 platform-tools platforms;android-34 ndk;25.2.9519653"
                 }
-              },
-              {
-                "name": "Build APK",
-                "env": {
-                  "OPENWEATHER_API_KEY": "${{ secrets.OPENWEATHER_API_KEY }}",
-                  "P4A_RELEASE_KEYALIAS": "${{ secrets.P4A_RELEASE_KEYALIAS }}",
-                  "P4A_RELEASE_KEYALIAS_PASSWD": "${{ secrets.P4A_RELEASE_KEYALIAS_PASSWD }}",
-                  "P4A_RELEASE_KEYSTORE": "${{ secrets.P4A_RELEASE_KEYSTORE }}",
-                  "P4A_RELEASE_KEYSTORE_PASSWD": "${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}"
-                },
-                "run": "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\nbuildozer android clean\nbuildozer -v android debug deploy 2>&1 | tee build.log\nif [ ${PIPESTATUS[0]} -ne 0 ]; then\n  cat build.log\n  exit 1\nfi"
               },
               {
                 "name": "Save Build Log",
@@ -3779,8 +3764,8 @@
                 "run": "pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/\npip config set global.trusted-host mirrors.aliyun.com\n"
               },
               {
-                "name": "Install Python dependencies with retry",
-                "run": "python -m pip install --upgrade pip setuptools || sleep 10 && python -m pip install --upgrade pip setuptools\npip install buildozer==1.5.0 kivy==2.3.1 requests==2.25.1 cython==0.29.36 certifi || sleep 10 && pip install buildozer==1.5.0 kivy==2.3.1 requests==2.25.1 cython==0.29.36 certifi\npip install python-for-android || sleep 10 && pip install python-for-android\n"
+                "name": "Install Python dependencies",
+                "run": "python -m pip install --upgrade pip setuptools\npip install buildozer==1.5.0 kivy==2.3.1 requests==2.25.1 cython==0.29.36 certifi\npip install python-for-android\n"
               },
               {
                 "name": "Set up Android SDK",
@@ -3792,10 +3777,6 @@
                 }
               },
               {
-                "name": "Clean build environment",
-                "run": "rm -rf ~/.buildozer/cache\ndf -h\ndu -h /tmp -d 1 --exclude=/tmp/systemd-private-* --exclude=/tmp/snap-private-tmp 2>/dev/null || true\n"
-              },
-              {
                 "name": "Initialize Buildozer",
                 "run": "buildozer init\ncat << 'EOF' > buildozer.spec\n[app]\ntitle = WeatherApp\npackage.name = weatherapp\npackage.domain = org.weatherapp\nsource.dir = .\nsource.include_exts = py,png,jpg,kv,atlas\nversion = 0.1\nrequirements = python3,kivy==2.3.1,requests==2.25.1,certifi\nandroid.permissions = INTERNET\nandroid.api = 34\nandroid.minapi = 21\nandroid.ndk = 25.2.9519653\nandroid.ndk_path = $ANDROID_NDK_HOME\nandroid.sdk_path = $ANDROID_HOME\nandroid.accept_sdk_license = True\norientation = portrait\nfullscreen = 0\nlog_level = 2\np4a.branch = master\nEOF\n"
               },
@@ -3804,7 +3785,11 @@
                 "run": "mkdir -p .buildozer/android/platform\ngit clone https://github.com/kivy/python-for-android.git .buildozer/android/platform/python-for-android\ncd .buildozer/android/platform/python-for-android\ngit checkout master\n"
               },
               {
-                "name": "Build APK with retry",
+                "name": "Clean build cache",
+                "run": "rm -rf ~/.buildozer/cache\nbuildozer android clean\n"
+              },
+              {
+                "name": "Build APK",
                 "env": {
                   "OPENWEATHER_API_KEY": "${{ secrets.OPENWEATHER_API_KEY }}",
                   "P4A_RELEASE_KEYALIAS": "${{ secrets.P4A_RELEASE_KEYALIAS }}",
@@ -3812,7 +3797,7 @@
                   "P4A_RELEASE_KEYSTORE": "${{ secrets.P4A_RELEASE_KEYSTORE }}",
                   "P4A_RELEASE_KEYSTORE_PASSWD": "${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}"
                 },
-                "run": "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\nbuildozer android clean\nbuildozer -v android debug deploy 2>&1 | tee build.log || (sleep 30 && buildozer -v android debug deploy 2>&1 | tee build.log)\nif [ ${PIPESTATUS[0]} -ne 0 ]; then\n  cat build.log\n  exit 1\nfi\n"
+                "run": "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\nbuildozer -v android debug deploy 2>&1 | tee build.log || (sleep 30 && buildozer -v android debug deploy 2>&1 | tee build.log)\nif [ ${PIPESTATUS[0]} -ne 0 ]; then\n  cat build.log\n  exit 1\nfi\n"
               },
               {
                 "name": "Verify Build Log",
@@ -3845,10 +3830,6 @@
                 }
               },
               {
-                "name": "Install Python dependencies",
-                "run": "python -m pip install --upgrade pip setuptools\npip install buildozer==1.5.0 kivy==2.3.1 requests==2.25.1 cython==0.29.36 certifi\npip install python-for-android"
-              },
-              {
                 "name": "Set up Android SDK",
                 "uses": "android-actions/setup-android@v3",
                 "with": {
@@ -3856,17 +3837,6 @@
                   "cmdline-tools-version": "latest",
                   "packages": "build-tools;34.0.0 platform-tools platforms;android-34 ndk;25.2.9519653"
                 }
-              },
-              {
-                "name": "Build APK",
-                "env": {
-                  "OPENWEATHER_API_KEY": "${{ secrets.OPENWEATHER_API_KEY }}",
-                  "P4A_RELEASE_KEYALIAS": "${{ secrets.P4A_RELEASE_KEYALIAS }}",
-                  "P4A_RELEASE_KEYALIAS_PASSWD": "${{ secrets.P4A_RELEASE_KEYALIAS_PASSWD }}",
-                  "P4A_RELEASE_KEYSTORE": "${{ secrets.P4A_RELEASE_KEYSTORE }}",
-                  "P4A_RELEASE_KEYSTORE_PASSWD": "${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}"
-                },
-                "run": "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\nbuildozer android clean\nbuildozer -v android debug deploy 2>&1 | tee build.log\nif [ ${PIPESTATUS[0]} -ne 0 ]; then\n  cat build.log\n  exit 1\nfi"
               },
               {
                 "name": "Save Build Log",
