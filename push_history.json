@@ -2963,9 +2963,13 @@
     }
   },
   "AutoDebug: Trigger new run (iteration 1)": {
-    "timestamp": "2025-05-12T06:53:06.135157+00:00",
+    "timestamp": "2025-05-12T07:39:35.768175+00:00",
     "changes": {
       "before": {
+        "name": "WeatherApp CI",
+        "permissions": {
+          "contents": "write"
+        },
         "jobs": {
           "build": {
             "runs-on": "Ubuntu-latest",
@@ -3065,24 +3069,24 @@
             ]
           }
         },
-        "name": "WeatherApp CI",
         "on": {
-          "pull_request": {
-            "branches": [
-              "main"
-            ]
-          },
           "push": {
             "branches": [
               "main"
             ]
+          },
+          "pull_request": {
+            "branches": [
+              "main"
+            ]
           }
-        },
-        "permissions": {
-          "contents": "write"
         }
       },
       "after": {
+        "name": "WeatherApp CI",
+        "permissions": {
+          "contents": "write"
+        },
         "jobs": {
           "build": {
             "runs-on": "Ubuntu-latest",
@@ -3182,21 +3186,17 @@
             ]
           }
         },
-        "name": "WeatherApp CI",
         "on": {
-          "pull_request": {
-            "branches": [
-              "main"
-            ]
-          },
           "push": {
             "branches": [
               "main"
             ]
+          },
+          "pull_request": {
+            "branches": [
+              "main"
+            ]
           }
-        },
-        "permissions": {
-          "contents": "write"
         }
       },
       "description": "Initial trigger push"
