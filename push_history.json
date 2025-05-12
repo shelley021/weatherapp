@@ -4981,7 +4981,7 @@
     }
   },
   "AutoDebug: Trigger new run (iteration {iteration})": {
-    "timestamp": "2025-05-12T02:57:45.054579+00:00",
+    "timestamp": "2025-05-12T03:00:33.273454+00:00",
     "changes": {
       "before": {
         "jobs": {
@@ -5040,7 +5040,6 @@
                 "run": "mkdir -p .buildozer/android/platform\ngit clone https://github.com/kivy/python-for-android.git .buildozer/android/platform/python-for-android\ncd .buildozer/android/platform/python-for-android\ngit checkout master"
               },
               {
-                "name": "Build APK",
                 "env": {
                   "OPENWEATHER_API_KEY": "${{ secrets.OPENWEATHER_API_KEY }}",
                   "P4A_RELEASE_KEYALIAS": "${{ secrets.P4A_RELEASE_KEYALIAS }}",
@@ -5048,16 +5047,17 @@
                   "P4A_RELEASE_KEYSTORE": "${{ secrets.P4A_RELEASE_KEYSTORE }}",
                   "P4A_RELEASE_KEYSTORE_PASSWD": "${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}"
                 },
+                "name": "Build APK",
                 "run": "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\nbuildozer android clean\nbuildozer -v android debug deploy 2>&1 | tee build.log\nif [ ${PIPESTATUS[0]} -ne 0 ]; then\n  cat build.log\n  exit 1\nfi"
               },
               {
-                "name": "Verify Build Log",
                 "if": "always()",
+                "name": "Verify Build Log",
                 "run": "if [ -f build.log ]; then\n  echo \"Build log exists, checking for errors...\"\n  if grep -q -E \"ERROR:|FAILED\" build.log; then\n    echo \"Errors found in build log:\"\n    grep -E \"ERROR:|FAILED\" build.log\n    exit 1\n  else\n    echo \"No critical errors found in build log\"\n  fi\nelse\n  echo \"No build log found\"\n  exit 1\nfi"
               },
               {
-                "name": "Save Build Log",
                 "if": "always()",
+                "name": "Save Build Log",
                 "uses": "actions/upload-artifact@v4",
                 "with": {
                   "name": "build-log",
@@ -5066,8 +5066,8 @@
                 }
               },
               {
-                "name": "Upload APK",
                 "if": "success()",
+                "name": "Upload APK",
                 "uses": "actions/upload-artifact@v4",
                 "with": {
                   "if-no-files-found": "error",
@@ -5079,7 +5079,13 @@
               {
                 "name": "Initial Trigger Step",
                 "run": "echo 'Initial trigger to start a new workflow'"
-              }
+              },
+              [
+                {
+                  "name": "Check Network Connectivity",
+                  "run": "ping -c 4 google.com || echo '网络连接失败，请检查网络'"
+                }
+              ]
             ]
           }
         },
@@ -5157,7 +5163,6 @@
                 "run": "mkdir -p .buildozer/android/platform\ngit clone https://github.com/kivy/python-for-android.git .buildozer/android/platform/python-for-android\ncd .buildozer/android/platform/python-for-android\ngit checkout master"
               },
               {
-                "name": "Build APK",
                 "env": {
                   "OPENWEATHER_API_KEY": "${{ secrets.OPENWEATHER_API_KEY }}",
                   "P4A_RELEASE_KEYALIAS": "${{ secrets.P4A_RELEASE_KEYALIAS }}",
@@ -5165,16 +5170,17 @@
                   "P4A_RELEASE_KEYSTORE": "${{ secrets.P4A_RELEASE_KEYSTORE }}",
                   "P4A_RELEASE_KEYSTORE_PASSWD": "${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}"
                 },
+                "name": "Build APK",
                 "run": "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\nbuildozer android clean\nbuildozer -v android debug deploy 2>&1 | tee build.log\nif [ ${PIPESTATUS[0]} -ne 0 ]; then\n  cat build.log\n  exit 1\nfi"
               },
               {
-                "name": "Verify Build Log",
                 "if": "always()",
+                "name": "Verify Build Log",
                 "run": "if [ -f build.log ]; then\n  echo \"Build log exists, checking for errors...\"\n  if grep -q -E \"ERROR:|FAILED\" build.log; then\n    echo \"Errors found in build log:\"\n    grep -E \"ERROR:|FAILED\" build.log\n    exit 1\n  else\n    echo \"No critical errors found in build log\"\n  fi\nelse\n  echo \"No build log found\"\n  exit 1\nfi"
               },
               {
-                "name": "Save Build Log",
                 "if": "always()",
+                "name": "Save Build Log",
                 "uses": "actions/upload-artifact@v4",
                 "with": {
                   "name": "build-log",
@@ -5183,8 +5189,8 @@
                 }
               },
               {
-                "name": "Upload APK",
                 "if": "success()",
+                "name": "Upload APK",
                 "uses": "actions/upload-artifact@v4",
                 "with": {
                   "if-no-files-found": "error",
@@ -5196,7 +5202,13 @@
               {
                 "name": "Initial Trigger Step",
                 "run": "echo 'Initial trigger to start a new workflow'"
-              }
+              },
+              [
+                {
+                  "name": "Check Network Connectivity",
+                  "run": "ping -c 4 google.com || echo '网络连接失败，请检查网络'"
+                }
+              ]
             ]
           }
         },
