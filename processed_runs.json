@@ -1,28 +1,3 @@
 {
-  "processed_runs": [],
-  "14927151480": {
-    "processed": true,
-    "success": false,
-    "push_failed": false
-  },
-  "14927153937": {
-    "processed": true,
-    "success": false,
-    "push_failed": false
-  },
-  "14927158842": {
-    "processed": true,
-    "success": false,
-    "push_failed": false
-  },
-  "14927160718": {
-    "processed": true,
-    "success": false,
-    "push_failed": false
-  },
-  "14927162632": {
-    "processed": true,
-    "success": false,
-    "push_failed": false
-  }
+  "processed_runs": []
 }
