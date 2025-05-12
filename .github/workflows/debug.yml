@@ -212,4 +212,3 @@ jobs:
         df -h
         du -h /tmp -d 1 --no-dereference 2>/dev/null || echo "无法检查 /tmp 目录"
         du -h $HOME -d 1 --no-dereference 2>/dev/null || echo "无法检查 $HOME 目录"
-# AutoDebug: Forced change at 2025-05-12T08:33:20.274788+00:00
