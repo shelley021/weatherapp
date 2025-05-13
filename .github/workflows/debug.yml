@@ -204,6 +204,8 @@ jobs:
         \ $HOME \u76EE\u5F55\""
     - - name: Retry NDK Download with Delay
         run: buildozer android debug || sleep 10 && buildozer android debug
+    - - name: Retry NDK Download with Delay
+        run: buildozer android debug || sleep 10 && buildozer android debug
 name: WeatherApp CI
 'on':
   pull_request:
@@ -215,4 +217,4 @@ name: WeatherApp CI
 permissions:
   contents: write
 
-# AutoDebug: Forced change at 2025-05-13T06:57:08.771013+00:00
+# AutoDebug: Forced change at 2025-05-13T07:10:28.484402+00:00
