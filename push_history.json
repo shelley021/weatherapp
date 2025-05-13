@@ -2963,7 +2963,7 @@
     }
   },
   "AutoDebug: Trigger new run (iteration 1)": {
-    "timestamp": "2025-05-13T08:33:08.819886+00:00",
+    "timestamp": "2025-05-13T09:10:00.391292+00:00",
     "changes": {
       "before": {
         "jobs": {
@@ -3034,6 +3034,7 @@
                 "run": "mkdir -p $HOME/tmp\necho \"TMPDIR=$HOME/tmp\" >> $GITHUB_ENV\necho \"TEMP=$HOME/tmp\" >> $GITHUB_ENV\necho \"TMP=$HOME/tmp\" >> $GITHUB_ENV\nexport TMPDIR=$HOME/tmp\nexport TEMP=$HOME/tmp\nexport TMP=$HOME/tmp"
               },
               {
+                "name": "Build APK",
                 "env": {
                   "OPENWEATHER_API_KEY": "${{ secrets.OPENWEATHER_API_KEY }}",
                   "P4A_RELEASE_KEYALIAS": "${{ secrets.P4A_RELEASE_KEYALIAS }}",
@@ -3041,17 +3042,16 @@
                   "P4A_RELEASE_KEYSTORE": "${{ secrets.P4A_RELEASE_KEYSTORE }}",
                   "P4A_RELEASE_KEYSTORE_PASSWD": "${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}"
                 },
-                "name": "Build APK",
                 "run": "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\nbuildozer android clean\nbuildozer -v android debug deploy 2>&1 | tee build.log || echo \"Build failed but log generated\" >> build.log\nif [ ${PIPESTATUS[0]} -ne 0 ]; then\n  cat build.log\n  exit 1\nfi"
               },
               {
-                "if": "always()",
                 "name": "Verify Build Log",
+                "if": "always()",
                 "run": "if [ -f build.log ]; then\n  echo \"Build log exists, checking for errors...\"\n  if grep -q -E \"ERROR:|FAILED\" build.log; then\n    echo \"Errors found in build log:\"\n    grep -E \"ERROR:|FAILED\" build.log\n    exit 1\n  else\n    echo \"No critical errors found in build log\"\n  fi\nelse\n  echo \"No build log found\"\n  exit 1\nfi"
               },
               {
-                "if": "always()",
                 "name": "Save Build Log",
+                "if": "always()",
                 "uses": "actions/upload-artifact@v4",
                 "with": {
                   "name": "build-log",
@@ -3060,8 +3060,8 @@
                 }
               },
               {
-                "if": "success()",
                 "name": "Upload APK",
+                "if": "success()",
                 "uses": "actions/upload-artifact@v4",
                 "with": {
                   "if-no-files-found": "error",
@@ -3085,19 +3085,7 @@
               {
                 "name": "Check Disk Space After Build",
                 "run": "echo \"Checking disk space after build...\"\ndf -h\ndu -h /tmp -d 1 --no-dereference 2>/dev/null || echo \"无法检查 /tmp 目录\"\ndu -h $HOME -d 1 --no-dereference 2>/dev/null || echo \"无法检查 $HOME 目录\""
-              },
-              [
-                {
-                  "name": "Retry NDK Download with Delay",
-                  "run": "buildozer android debug || sleep 10 && buildozer android debug"
-                }
-              ],
-              [
-                {
-                  "name": "Check Network Connectivity",
-                  "run": "ping -c 4 google.com || echo '网络连接失败，请检查网络'"
-                }
-              ]
+              }
             ]
           }
         },
@@ -3187,6 +3175,7 @@
                 "run": "mkdir -p $HOME/tmp\necho \"TMPDIR=$HOME/tmp\" >> $GITHUB_ENV\necho \"TEMP=$HOME/tmp\" >> $GITHUB_ENV\necho \"TMP=$HOME/tmp\" >> $GITHUB_ENV\nexport TMPDIR=$HOME/tmp\nexport TEMP=$HOME/tmp\nexport TMP=$HOME/tmp"
               },
               {
+                "name": "Build APK",
                 "env": {
                   "OPENWEATHER_API_KEY": "${{ secrets.OPENWEATHER_API_KEY }}",
                   "P4A_RELEASE_KEYALIAS": "${{ secrets.P4A_RELEASE_KEYALIAS }}",
@@ -3194,17 +3183,16 @@
                   "P4A_RELEASE_KEYSTORE": "${{ secrets.P4A_RELEASE_KEYSTORE }}",
                   "P4A_RELEASE_KEYSTORE_PASSWD": "${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}"
                 },
-                "name": "Build APK",
                 "run": "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\nbuildozer android clean\nbuildozer -v android debug deploy 2>&1 | tee build.log || echo \"Build failed but log generated\" >> build.log\nif [ ${PIPESTATUS[0]} -ne 0 ]; then\n  cat build.log\n  exit 1\nfi"
               },
               {
-                "if": "always()",
                 "name": "Verify Build Log",
+                "if": "always()",
                 "run": "if [ -f build.log ]; then\n  echo \"Build log exists, checking for errors...\"\n  if grep -q -E \"ERROR:|FAILED\" build.log; then\n    echo \"Errors found in build log:\"\n    grep -E \"ERROR:|FAILED\" build.log\n    exit 1\n  else\n    echo \"No critical errors found in build log\"\n  fi\nelse\n  echo \"No build log found\"\n  exit 1\nfi"
               },
               {
-                "if": "always()",
                 "name": "Save Build Log",
+                "if": "always()",
                 "uses": "actions/upload-artifact@v4",
                 "with": {
                   "name": "build-log",
@@ -3213,8 +3201,8 @@
                 }
               },
               {
-                "if": "success()",
                 "name": "Upload APK",
+                "if": "success()",
                 "uses": "actions/upload-artifact@v4",
                 "with": {
                   "if-no-files-found": "error",
@@ -3238,19 +3226,7 @@
               {
                 "name": "Check Disk Space After Build",
                 "run": "echo \"Checking disk space after build...\"\ndf -h\ndu -h /tmp -d 1 --no-dereference 2>/dev/null || echo \"无法检查 /tmp 目录\"\ndu -h $HOME -d 1 --no-dereference 2>/dev/null || echo \"无法检查 $HOME 目录\""
-              },
-              [
-                {
-                  "name": "Retry NDK Download with Delay",
-                  "run": "buildozer android debug || sleep 10 && buildozer android debug"
-                }
-              ],
-              [
-                {
-                  "name": "Check Network Connectivity",
-                  "run": "ping -c 4 google.com || echo '网络连接失败，请检查网络'"
-                }
-              ]
+              }
             ]
           }
         },
