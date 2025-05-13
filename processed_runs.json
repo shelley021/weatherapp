@@ -1,6 +1,17 @@
 {
-  "processed_runs": [
-    "14990621380",
-    "14991340578"
-  ]
+  "14990621380": {
+    "processed": true,
+    "success": false,
+    "push_failed": false
+  },
+  "14991340578": {
+    "processed": true,
+    "success": false,
+    "push_failed": false
+  },
+  "14991782701": {
+    "processed": true,
+    "success": false,
+    "push_failed": false
+  }
 }
