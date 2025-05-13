@@ -51,29 +51,22 @@ jobs:
     - name: Download Android NDK with Retry
       run: "NDK_URL=\"https://dl.google.com/android/repository/android-ndk-r25b-linux.zip\"\
         \nNDK_PATH=\"$HOME/android-ndk-r25b.zip\"\nNDK_INSTALL_DIR=\"$HOME/.buildozer/android/platform/android-ndk-r25b\"\
-        \nEXPECTED_MD5=\"c7e5b3c4b9e7d8f9a1b2c3d4e5f6a7b\"  # \u66FF\u6362\u4E3A\u5B9E\
-        \u9645\u7684 MD5 \u6821\u9A8C\u548C\nMAX_RETRIES=5\nRETRY_DELAY=15\nfor i\
-        \ in $(seq 1 $MAX_RETRIES); do\n  echo \"\u5C1D\u8BD5\u4E0B\u8F7D Android\
-        \ NDK (\u7B2C $i \u6B21)...\"\n  curl -L -o \"$NDK_PATH\" \"$NDK_URL\" --retry\
-        \ 5 --retry-delay 5 --retry-max-time 600 --connect-timeout 60\n  if [ $? -eq\
-        \ 0 ]; then\n    # \u8BA1\u7B97\u6587\u4EF6\u7684 MD5 \u6821\u9A8C\u548C\n\
-        \    DOWNLOADED_MD5=$(md5sum \"$NDK_PATH\" | awk '{print $1}')\n    if [ \"\
-        $DOWNLOADED_MD5\" = \"$EXPECTED_MD5\" ]; then\n      echo \"NDK \u4E0B\u8F7D\
-        \u6210\u529F\uFF0CMD5 \u6821\u9A8C\u901A\u8FC7\uFF1A$DOWNLOADED_MD5\"\n  \
-        \    break\n    else\n      echo \"NDK \u6587\u4EF6 MD5 \u6821\u9A8C\u5931\
-        \u8D25\uFF0C\u9884\u671F\uFF1A$EXPECTED_MD5\uFF0C\u5B9E\u9645\uFF1A$DOWNLOADED_MD5\"\
-        \n      rm -f \"$NDK_PATH\"\n    fi\n  fi\n  if [ $i -lt $MAX_RETRIES ]; then\n\
-        \    echo \"\u4E0B\u8F7D\u5931\u8D25\uFF0C\u7B49\u5F85 $RETRY_DELAY \u79D2\
-        \u540E\u91CD\u8BD5...\"\n    sleep $RETRY_DELAY\n  else\n    echo \"\u4E0B\
-        \u8F7D Android NDK \u5931\u8D25\uFF0C\u9000\u51FA...\"\n    exit 1\n  fi\n\
-        done\nmkdir -p \"$HOME/.buildozer/android/platform\"\nunzip -q \"$NDK_PATH\"\
-        \ -d \"$HOME/.buildozer/android/platform\" || {\n  echo \"\u89E3\u538B NDK\
-        \ \u5931\u8D25\uFF0C\u8BF7\u68C0\u67E5\u6587\u4EF6\u5B8C\u6574\u6027\"\n \
-        \ exit 1\n}\nif [ -d \"$NDK_INSTALL_DIR\" ]; then\n  echo \"NDK \u89E3\u538B\
-        \u6210\u529F\uFF0C\u8DEF\u5F84\uFF1A$NDK_INSTALL_DIR\"\nelse\n  echo \"NDK\
-        \ \u89E3\u538B\u5931\u8D25\uFF0C\u672A\u627E\u5230\u9884\u671F\u76EE\u5F55\
-        \uFF1A$NDK_INSTALL_DIR\"\n  exit 1\nfi\nexport ANDROID_NDK_HOME=\"$NDK_INSTALL_DIR\"\
-        \necho \"ANDROID_NDK_HOME=$ANDROID_NDK_HOME\" >> $GITHUB_ENV"
+        \nEXPECTED_MD5=\"c7e5b3c4b9e7d8f9a1b2c3d4e5f6a7b\"  # 替换为实际的 MD5 校验和\nMAX_RETRIES=5\n\
+        RETRY_DELAY=15\nfor i in $(seq 1 $MAX_RETRIES); do\n  echo \"尝试下载 Android\
+        \ NDK (第 $i 次)...\"\n  curl -L -o \"$NDK_PATH\" \"$NDK_URL\" --retry 5 --retry-delay\
+        \ 5 --retry-max-time 600 --connect-timeout 60\n  if [ $? -eq 0 ]; then\n \
+        \   # 计算文件的 MD5 校验和\n    DOWNLOADED_MD5=$(md5sum \"$NDK_PATH\" | awk '{print\
+        \ $1}')\n    if [ \"$DOWNLOADED_MD5\" = \"$EXPECTED_MD5\" ]; then\n      echo\
+        \ \"NDK 下载成功，MD5 校验通过：$DOWNLOADED_MD5\"\n      break\n    else\n      echo\
+        \ \"NDK 文件 MD5 校验失败，预期：$EXPECTED_MD5，实际：$DOWNLOADED_MD5\"\n      rm -f \"\
+        $NDK_PATH\"\n    fi\n  fi\n  if [ $i -lt $MAX_RETRIES ]; then\n    echo \"\
+        下载失败，等待 $RETRY_DELAY 秒后重试...\"\n    sleep $RETRY_DELAY\n  else\n    echo \"\
+        下载 Android NDK 失败，退出...\"\n    exit 1\n  fi\ndone\nmkdir -p \"$HOME/.buildozer/android/platform\"\
+        \nunzip -q \"$NDK_PATH\" -d \"$HOME/.buildozer/android/platform\" || {\n \
+        \ echo \"解压 NDK 失败，请检查文件完整性\"\n  exit 1\n}\nif [ -d \"$NDK_INSTALL_DIR\" ];\
+        \ then\n  echo \"NDK 解压成功，路径：$NDK_INSTALL_DIR\"\nelse\n  echo \"NDK 解压失败，未找到预期目录：$NDK_INSTALL_DIR\"\
+        \n  exit 1\nfi\nexport ANDROID_NDK_HOME=\"$NDK_INSTALL_DIR\"\necho \"ANDROID_NDK_HOME=$ANDROID_NDK_HOME\"\
+        \ >> $GITHUB_ENV"
     - name: Initialize Buildozer
       run: 'buildozer init
 
@@ -140,35 +133,35 @@ jobs:
         export TEMP=$HOME/tmp
 
         export TMP=$HOME/tmp'
-    - env:
+    - name: Build APK
+      env:
         OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
         P4A_RELEASE_KEYALIAS: ${{ secrets.P4A_RELEASE_KEYALIAS }}
         P4A_RELEASE_KEYALIAS_PASSWD: ${{ secrets.P4A_RELEASE_KEYALIAS_PASSWD }}
         P4A_RELEASE_KEYSTORE: ${{ secrets.P4A_RELEASE_KEYSTORE }}
         P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}
-      name: Build APK
       run: "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds\
         \ -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE\
         \ -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\n\
         buildozer android clean\nbuildozer -v android debug deploy 2>&1 | tee build.log\
         \ || echo \"Build failed but log generated\" >> build.log\nif [ ${PIPESTATUS[0]}\
         \ -ne 0 ]; then\n  cat build.log\n  exit 1\nfi"
-    - if: always()
-      name: Verify Build Log
+    - name: Verify Build Log
+      if: always()
       run: "if [ -f build.log ]; then\n  echo \"Build log exists, checking for errors...\"\
         \n  if grep -q -E \"ERROR:|FAILED\" build.log; then\n    echo \"Errors found\
         \ in build log:\"\n    grep -E \"ERROR:|FAILED\" build.log\n    exit 1\n \
         \ else\n    echo \"No critical errors found in build log\"\n  fi\nelse\n \
         \ echo \"No build log found\"\n  exit 1\nfi"
-    - if: always()
-      name: Save Build Log
+    - name: Save Build Log
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: build-log
         path: build.log
         retention-days: 1
-    - if: success()
-      name: Upload APK
+    - name: Upload APK
+      if: success()
       uses: actions/upload-artifact@v4
       with:
         if-no-files-found: error
@@ -176,10 +169,15 @@ jobs:
         path: bin/weatherapp-*.apk
         retention-days: 1
     - name: Check Disk Space Before Build
-      run: "echo \"Checking disk space before build...\"\ndf -h\ndu -h /tmp -d 1 --no-dereference\
-        \ 2>/dev/null || echo \"\u65E0\u6CD5\u68C0\u67E5 /tmp \u76EE\u5F55\"\ndu -h\
-        \ $HOME -d 1 --no-dereference 2>/dev/null || echo \"\u65E0\u6CD5\u68C0\u67E5\
-        \ $HOME \u76EE\u5F55\"\n"
+      run: 'echo "Checking disk space before build..."
+
+        df -h
+
+        du -h /tmp -d 1 --no-dereference 2>/dev/null || echo "无法检查 /tmp 目录"
+
+        du -h $HOME -d 1 --no-dereference 2>/dev/null || echo "无法检查 $HOME 目录"
+
+        '
     - name: Clean Disk Space
       run: 'echo "Cleaning disk space..."
 
@@ -195,15 +193,13 @@ jobs:
     - name: Initial Trigger Step
       run: echo 'Initial trigger to start a new workflow'
     - name: Check Disk Space After Build
-      run: "echo \"Checking disk space after build...\"\ndf -h\ndu -h /tmp -d 1 --no-dereference\
-        \ 2>/dev/null || echo \"\u65E0\u6CD5\u68C0\u67E5 /tmp \u76EE\u5F55\"\ndu -h\
-        \ $HOME -d 1 --no-dereference 2>/dev/null || echo \"\u65E0\u6CD5\u68C0\u67E5\
-        \ $HOME \u76EE\u5F55\""
-    - - name: Retry NDK Download with Delay
-        run: buildozer android debug || sleep 10 && buildozer android debug
-    - - name: Check Network Connectivity
-        run: "ping -c 4 google.com || echo '\u7F51\u7EDC\u8FDE\u63A5\u5931\u8D25\uFF0C\
-          \u8BF7\u68C0\u67E5\u7F51\u7EDC'"
+      run: 'echo "Checking disk space after build..."
+
+        df -h
+
+        du -h /tmp -d 1 --no-dereference 2>/dev/null || echo "无法检查 /tmp 目录"
+
+        du -h $HOME -d 1 --no-dereference 2>/dev/null || echo "无法检查 $HOME 目录"'
 name: WeatherApp CI
 'on':
   pull_request:
@@ -215,10 +211,4 @@ name: WeatherApp CI
 permissions:
   contents: write
 
-# AutoDebug: Forced change at 2025-05-13T08:23:00.068113+00:00
-
-# AutoDebug: Forced change at 2025-05-13T08:33:06.966803+00:00
-
-# AutoDebug: Forced change at 2025-05-13T08:43:13.948541+00:00
-
-# AutoDebug: Forced change at 2025-05-13T08:55:54.005637+00:00
+# AutoDebug: Forced change at 2025-05-13T09:02:19.412162+00:00
