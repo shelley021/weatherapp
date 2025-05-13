@@ -194,9 +194,6 @@ jobs:
         '
     - name: Initial Trigger Step
       run: echo 'Initial trigger to start a new workflow'
-    - name: Check Network Connectivity
-      run: "ping -c 4 google.com || echo '\u7F51\u7EDC\u8FDE\u63A5\u5931\u8D25\uFF0C\
-        \u8BF7\u68C0\u67E5\u7F51\u7EDC'"
     - name: Check Disk Space After Build
       run: "echo \"Checking disk space after build...\"\ndf -h\ndu -h /tmp -d 1 --no-dereference\
         \ 2>/dev/null || echo \"\u65E0\u6CD5\u68C0\u67E5 /tmp \u76EE\u5F55\"\ndu -h\
@@ -204,6 +201,9 @@ jobs:
         \ $HOME \u76EE\u5F55\""
     - - name: Retry NDK Download with Delay
         run: buildozer android debug || sleep 10 && buildozer android debug
+    - - name: Check Network Connectivity
+        run: "ping -c 4 google.com || echo '\u7F51\u7EDC\u8FDE\u63A5\u5931\u8D25\uFF0C\
+          \u8BF7\u68C0\u67E5\u7F51\u7EDC'"
 name: WeatherApp CI
 'on':
   pull_request:
@@ -215,4 +215,4 @@ name: WeatherApp CI
 permissions:
   contents: write
 
-# AutoDebug: Forced change at 2025-05-13T08:10:40.945988+00:00
+# AutoDebug: Forced change at 2025-05-13T08:23:00.068113+00:00
