@@ -61,9 +61,11 @@ jobs:
         wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
         unzip -q cmdline-tools.zip -d $ANDROID_HOME/cmdline-tools
         mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
+        chmod +x $ANDROID_HOME/cmdline-tools/latest/bin/*
         rm cmdline-tools.zip
         echo "PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools" >> $GITHUB_ENV
         ls -l $ANDROID_HOME/cmdline-tools/latest/bin  # Debug: Verify sdkmanager exists
+        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --version || echo "sdkmanager version check failed"
     - name: Accept Android SDK Licenses
       run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
     - name: Diagnose Network Connectivity
@@ -94,22 +96,22 @@ jobs:
       run: "NDK_URL=\"https://dl.google.com/android/repository/android-ndk-r27c-linux.zip\"\
         \nNDK_PATH=\"$HOME/android-ndk-r27c.zip\"\nNDK_DIRECTORY=\"$HOME/.buildozer/android/platform/android-ndk-r27c\"\
         \nEXPECTED_MD5=\"52f5ef6a8eea8426c9748fb29bba85cc\"\nMAX_RETRIES=5\nRETRY_DELAY=15\nfor i\
-        \ in $(seq 1 $MAX_RETRIES); do\n  echo \"\u5C1D\u8BD5\u4E0B\u8F7D Android NDK (\u7B2C $i \u6B21)...\"\n  curl -L -o \"$NDK_PATH\" \"$NDK_URL\" --retry\
+        \ in $(seq 1 $MAX_RETRIES); do\n  echo \"\u5C1D\u8BD5\u4E0B\u8F7D Android\
+        \ NDK (\u7B2C $i \u6B21)...\"\n  curl -L -o \"$NDK_PATH\" \"$NDK_URL\" --retry\
         \ 5 --retry-delay 5 --retry-max-time 600 --connect-timeout 60\n  if [ $? -eq\
         \ 0 ]; then\n    # \u8BA1\u7B97\u6587\u4EF6\u7684 MD5 \u6821\u9A8C\u548C\n\
-        \    DOWNLOADED_MD5=$(md5sum \"$NDK_PATH\" | awk '{print $1}')\n    if [ \"$DOWNLOADED_MD5\" = \"$EXPECTED_MD5\" ]; then\n      echo \"NDK \u4E0B\u8F7D\
-        \u6210\u529F\uFF0C MD5 \u6821\u9A8C\u901A\u8FC7\uFF1A$DOWNLOADED_MD5\"\n  \
+        \    DOWNLOADED_MD5=$(md5sum \"$NDK_PATH\" | awk '{print $1}')\n    if [ \"\
+        $DOWNLOADED_MD5\" = \"$EXPECTED_MD5\" ]; then\n      echo \"NDK \u4E0B\u8F7D\
+        \u6210\u529F\uFF0CMD5 \u6821\u9A8C\u901A\u8FC7\uFF1A$DOWNLOADED_MD5\"\n  \
         \    break\n    else\n      echo \"NDK \u6587\u4EF6 MD5 \u6821\u9A8C\u5931\
-        \u8D25\uFF0C\u9884\u671F\uFF1A$EXPECTED_MD5\uFF0C\u5B9E\u9645\uFF1A$DOWNLOADED_MD5\"\n      rm -f \"$NDK_PATH\"\n    fi\n  fi\n  if [ $i -lt $MAX_RETRIES ]; then\n\
+        \u8D25\uFF0C\u9884\u671F\uFF1A$EXPECTED_MD5\uFF0C\u5B9E\u9645\uFF1A$DOWNLOADED_MD5\"\
+        \n      rm -f \"$NDK_PATH\"\n    fi\n  fi\n  if [ $i -lt $MAX_RETRIES ]; then\n\
         \    echo \"\u4E0B\u8F7D\u5931\u8D25\uFF0C\u7B49\u5F85 $RETRY_DELAY \u79D2\
         \u540E\u91CD\u8BD5...\"\n    sleep $RETRY_DELAY\n  else\n    echo \"\u4E0B\
         \u8F7D Android NDK \u5931\u8D25\uFF0C\u9000\u51FA...\"\n    exit 1\n  fi\n\
-        done\nmkdir -p \"$HOME/.buildozer/android/platform\"\nunzip -q \"$NDK_PATH\"\
-        \ -d \"$HOME/.buildozer/android/platform\" || {\n  echo \"\u89E3\u538B NDK\
-        \ \u5931\u8D25\uFF0C\u8BF7\u68C0\u67E5\u6587\u4EF6\u5B8C\u6574\u6027\"\n \
-        \ exit 1\n}\nif [ -d \"$NDK_DIRECTORY\" ]; then\n  echo \"NDK \u89E3\u538B\
-        \u6210\u529F\uFF0C\u8DEF\u5F84\uFF1A$NDK_DIRECTORY\"\nelse\n  echo \"NDK\
-        \ \u89E3\u538B\u5931\u8D25\uFF0C\u672A\u627E\u5230\u9884\u671F\u76EE\u5F55\
+        done\nmkdir -p \"$HOME/.buildozer/android\"\nunzip -q \"$NDK_PATH\" -d \"$HOME/.buildozer/android\" || {\n  echo \"\u89E3\u538B NDK \u5931\u8D25\uFF0C\
+        \u8BF7\u68C0\u67E5\u6587\u4EF6\u5B8C\u6574\u6027\"\n  exit 1\n}\nif [ -d \"$NDK_DIRECTORY\" ]; then\n  echo \"NDK \u89E3\u538B\u6210\u529F\uFF0C\
+        \u8DEF\u5F84\uFF1A$NDK_DIRECTORY\"\nelse\n  echo \"NDK \u89E3\u538B\u5931\u8D25\uFF0C\u672A\u627E\u5230\u9884\u671F\u76EE\u5F55\
         \uFF1A$NDK_DIRECTORY\"\n  exit 1\nfi\nexport ANDROID_NDK_HOME=\"$NDK_DIRECTORY\"\
         \necho \"ANDROID_NDK_HOME=$ANDROID_NDK_HOME\" >> $GITHUB_ENV"
     - name: Initialize Buildozer
