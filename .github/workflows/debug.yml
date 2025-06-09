@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: Ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 17
@@ -59,11 +59,28 @@ jobs:
         packages: build-tools;34.0.0 platform-tools platforms;android-34 ndk;27.2.12479018
     - name: Accept Android SDK Licenses
       run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-    - name: Install Android SDK Platform Tools
+    - name: Diagnose Network Connectivity
+      run: |
+        echo "Checking network connectivity..."
+        ping -c 4 dl.google.com || echo "Cannot ping dl.google.com"
+        curl -I https://dl.google.com/android/repository/android-ndk-r27c-linux.zip || echo "Cannot reach NDK URL"
+        ping -c 4 www.openssl.org || echo "Cannot ping www.openssl.org"
+    - name: Install Android SDK Platform Tools with Retry
       run: |
         echo "ANDROID_HOME=$ANDROID_HOME"
         export ANDROID_HOME=/usr/local/lib/android/sdk
-        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "build-tools;34.0.0" "platforms;android-34" || true
+        MAX_RETRIES=3
+        RETRY_DELAY=10
+        for i in $(seq 1 $MAX_RETRIES); do
+          echo "Attempt $i to install SDK platform tools..."
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "build-tools;34.0.0" "platforms;android-34" && break
+          echo "Attempt $i failed, waiting $RETRY_DELAY seconds..."
+          sleep $RETRY_DELAY
+          if [ $i -eq $MAX_RETRIES ]; then
+            echo "Failed to install SDK platform tools after $MAX_RETRIES attempts."
+            exit 1
+          fi
+        done
     - name: Download Android NDK with Retry
       run: "NDK_URL=\"https://dl.google.com/android/repository/android-ndk-r27c-linux.zip\"\
         \nNDK_PATH=\"$HOME/android-ndk-r27c.zip\"\nNDK_INSTALL_DIR=\"$HOME/.buildozer/android/platform/android-ndk-r27c\"\
@@ -108,7 +125,7 @@ jobs:
 
         version = 0.1
 
-        requirements = python3,kivy==2.3.1,requests==2.25.1,certifi,openpyxl
+        requirements = python3,kivy==2.3.1,requests==2.25.1,certifi,openpyxl,openssl==3.0.15
 
         android.permissions = INTERNET
 
@@ -141,6 +158,24 @@ jobs:
         cd .buildozer/android/platform/python-for-android
 
         git checkout master'
+    - name: Pre-Download OpenSSL
+      run: |
+        OPENSSL_URL="https://www.openssl.org/source/openssl-3.0.15.tar.gz"
+        OPENSSL_CACHE="/home/runner/.buildozer/cache"
+        mkdir -p $OPENSSL_CACHE
+        MAX_RETRIES=3
+        RETRY_DELAY=10
+        for i in $(seq 1 $MAX_RETRIES); do
+          echo "Attempt $i to download OpenSSL..."
+          curl -L -o $OPENSSL_CACHE/openssl-3.0.15.tar.gz $OPENSSL_URL && break
+          echo "Attempt $i failed, waiting $RETRY_DELAY seconds..."
+          sleep $RETRY_DELAY
+          if [ $i -eq $MAX_RETRIES ]; then
+            echo "Failed to download OpenSSL after $MAX_RETRIES attempts."
+            exit 1
+          fi
+        done
+        ls -l $OPENSSL_CACHE
     - name: Set Custom Temp Directory
       run: 'mkdir -p $HOME/tmp
 
