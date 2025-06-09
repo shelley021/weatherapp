@@ -1,0 +1,106 @@
+# Check configuration tokens
+# Ensure build layout
+# Check configuration tokens
+# Preparing build
+# Check requirements for android
+# Search for Git (git)
+#  -> found at /usr/bin/git
+# Search for Cython (cython)
+#  -> found at /opt/hostedtoolcache/Python/3.10.17/x64/bin/cython
+# Search for Java compiler (javac)
+#  -> found at /usr/lib/jvm/temurin-17-jdk-amd64/bin/javac
+# Search for Java keytool (keytool)
+#  -> found at /usr/lib/jvm/temurin-17-jdk-amd64/bin/keytool
+# Install platform
+# Run ['git', 'config', '--get', 'remote.origin.url']
+# Cwd /home/runner/work/weatherapp/weatherapp/.buildozer/android/platform/python-for-android
+https://github.com/kivy/python-for-android.git
+# Run ['git', 'branch', '-vv']
+# Cwd /home/runner/work/weatherapp/weatherapp/.buildozer/android/platform/python-for-android
+  develop be3de2e2 [origin/develop] Merge pull request #3135 from T-Dynamos/sdl2_image_fix
+* master  957a3e5f [origin/master] Merge pull request #2959 from kivy/release-2024.01.21
+# Detected old url/branch (https://github.com/kivy/python-for-android.git/be3de2e2), deleting...
+# Run ['git', 'clone', '-b', 'master', '--single-branch', 'https://github.com/kivy/python-for-android.git', 'python-for-android']
+# Cwd /home/runner/work/weatherapp/weatherapp/.buildozer/android/platform
+Cloning into 'python-for-android'...
+# Run ['/opt/hostedtoolcache/Python/3.10.17/x64/bin/python', '-m', 'pip', 'install', '-q', '--user', 'appdirs', 'colorama>=0.3.3', 'jinja2', 'sh>=1.10, <2.0; sys_platform!="win32"', 'build', 'toml', 'packaging', 'setuptools']
+# Cwd None
+# Android ANT is missing, downloading
+# Downloading https://archive.apache.org/dist/ant/binaries/apache-ant-1.9.4-bin.tar.gz
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/urllib/request.py", line 1787, in open
+    return getattr(self, name)(url)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/urllib/request.py", line 1996, in open_https
+    return self._open_generic_http(self._https_connection, url, data)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/urllib/request.py", line 1945, in _open_generic_http
+    http_conn.request("GET", selector, headers=headers)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 1283, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 1329, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 1278, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 1038, in _send_output
+    self.send(msg)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 976, in send
+    self.connect()
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 1448, in connect
+    super().connect()
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 942, in connect
+    self.sock = self._create_connection(
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/socket.py", line 857, in create_connection
+    raise err
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/socket.py", line 845, in create_connection
+    sock.connect(sa)
+OSError: [Errno 101] Network is unreachable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/bin/buildozer", line 8, in <module>
+    sys.exit(main())
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/buildozer/scripts/client.py", line 13, in main
+    Buildozer().run_command(sys.argv[1:])
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/buildozer/__init__.py", line 1024, in run_command
+    self.target.run_commands(args)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/buildozer/target.py", line 93, in run_commands
+    func(args)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/buildozer/target.py", line 103, in cmd_debug
+    self.buildozer.prepare_for_build()
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/buildozer/__init__.py", line 172, in prepare_for_build
+    self.target.install_platform()
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/buildozer/targets/android.py", line 613, in install_platform
+    self._install_apache_ant()
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/buildozer/targets/android.py", line 348, in _install_apache_ant
+    self.buildozer.download(url,
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/buildozer/__init__.py", line 658, in download
+    urlretrieve(url, filename, report_hook)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/urllib/request.py", line 1821, in retrieve
+    fp = self.open(url, data)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/urllib/request.py", line 1793, in open
+    raise OSError('socket error', msg).with_traceback(sys.exc_info()[2])
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/urllib/request.py", line 1787, in open
+    return getattr(self, name)(url)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/urllib/request.py", line 1996, in open_https
+    return self._open_generic_http(self._https_connection, url, data)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/urllib/request.py", line 1945, in _open_generic_http
+    http_conn.request("GET", selector, headers=headers)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 1283, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 1329, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 1278, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 1038, in _send_output
+    self.send(msg)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 976, in send
+    self.connect()
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 1448, in connect
+    super().connect()
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 942, in connect
+    self.sock = self._create_connection(
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/socket.py", line 857, in create_connection
+    raise err
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/socket.py", line 845, in create_connection
+    sock.connect(sa)
+OSError: [Errno socket error] [Errno 101] Network is unreachable
