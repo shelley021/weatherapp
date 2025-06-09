@@ -1,4 +1,12 @@
 auto_debug.py
 .env
 debug/
-autodebug/
+autodebug/.env
+.env
+.env
+__pycache__
+*.pyc
+*:Zone.Identifier
+logs/
+backup/
+backups/
