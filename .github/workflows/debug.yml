@@ -60,10 +60,9 @@ jobs:
     - name: Accept Android SDK Licenses
       run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
     - name: Download Android NDK with Retry
-      run: "NDK_URL=\"https://dl.google.com/android/repository/android-ndk-r25b-linux.zip\"\
-        \nNDK_PATH=\"$HOME/android-ndk-r25b.zip\"\nNDK_INSTALL_DIR=\"$HOME/.buildozer/android/platform/android-ndk-r25b\"\
-        \nEXPECTED_MD5=\"c7e5b3c4b9e7d8f9a1b2c3d4e5f6a7b\"  # \u66FF\u6362\u4E3A\u5B9E\
-        \u9645\u7684 MD5 \u6821\u9A8C\u548C\nMAX_RETRIES=5\nRETRY_DELAY=15\nfor i\
+      run: "NDK_URL=\"https://dl.google.com/android/repository/android-ndk-r26d-linux.zip\"\
+        \nNDK_PATH=\"$HOME/android-ndk-r26d.zip\"\nNDK_INSTALL_DIR=\"$HOME/.buildozer/android/platform/android-ndk-r26d\"\
+        \nEXPECTED_MD5=\"302f62deb2931a03f91625ec3107dd0b\"  # Updated to match actual file\nMAX_RETRIES=5\nRETRY_DELAY=15\nfor i\
         \ in $(seq 1 $MAX_RETRIES); do\n  echo \"\u5C1D\u8BD5\u4E0B\u8F7D Android\
         \ NDK (\u7B2C $i \u6B21)...\"\n  curl -L -o \"$NDK_PATH\" \"$NDK_URL\" --retry\
         \ 5 --retry-delay 5 --retry-max-time 600 --connect-timeout 60\n  if [ $? -eq\
