@@ -56,13 +56,13 @@ jobs:
       with:
         accept-android-sdk-licenses: true
         cmdline-tools-version: latest
-        packages: build-tools;34.0.0 platform-tools platforms;android-34 ndk;25.2.9519653
+        packages: build-tools;34.0.0 platform-tools platforms;android-34 ndk;27.2.12479018
     - name: Accept Android SDK Licenses
       run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
     - name: Download Android NDK with Retry
       run: "NDK_URL=\"https://dl.google.com/android/repository/android-ndk-r27c-linux.zip\"\
         \nNDK_PATH=\"$HOME/android-ndk-r27c.zip\"\nNDK_INSTALL_DIR=\"$HOME/.buildozer/android/platform/android-ndk-r27c\"\
-        \nEXPECTED_MD5=\"52f5ef6a8eea8426c9748fb29bba85cc\"  # Updated to match actual file\nMAX_RETRIES=5\nRETRY_DELAY=15\nfor i\
+        \nEXPECTED_MD5=\"52f5ef6a8eea8426c9748fb29bba85cc\"\nMAX_RETRIES=5\nRETRY_DELAY=15\nfor i\
         \ in $(seq 1 $MAX_RETRIES); do\n  echo \"\u5C1D\u8BD5\u4E0B\u8F7D Android\
         \ NDK (\u7B2C $i \u6B21)...\"\n  curl -L -o \"$NDK_PATH\" \"$NDK_URL\" --retry\
         \ 5 --retry-delay 5 --retry-max-time 600 --connect-timeout 60\n  if [ $? -eq\
@@ -95,15 +95,15 @@ jobs:
 
         package.name = weatherapp
 
-        package.domain = org.weatherapp
+        package.domain = org.weatherpkg
 
         source.dir = .
 
-        source.include_exts = py,png,jpg,kv,atlas
+        source.include_exts = py,png,jpg,kv,atlas,xlsx
 
         version = 0.1
 
-        requirements = python3,kivy==2.3.1,requests==2.25.1,certifi
+        requirements = python3,kivy==2.3.1,requests==2.25.1,certifi,openpyxl
 
         android.permissions = INTERNET
 
@@ -111,17 +111,17 @@ jobs:
 
         android.minapi = 21
 
-        android.ndk = 25b
+        android.ndk = 27
 
         android.ndk_path = $ANDROID_NDK_HOME
 
         android.sdk_path = $ANDROID_HOME
 
-        android.accept_sdk_license = True
+        android.accept_sdk = True
 
         orientation = portrait
 
-        fullscreen = 0
+        fullscreen = 1
 
         log_level = 2
 
