@@ -72,9 +72,9 @@ jobs:
         whoami  # Debug: Check user
         stat $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager  # Debug: Check permissions
         which sdkmanager  # Debug: Verify PATH
-        sudo $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --version > sdkmanager_version.log 2>&1 || cat sdkmanager_version.log
+        sudo sh -x $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --version > sdkmanager_version.log 2>&1 || cat sdkmanager_version.log
     - name: Accept Android SDK Licenses
-      run: yes | sudo $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > licenses.log 2>&1 || cat licenses.log
+      run: yes | sudo sh -x $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > licenses.log 2>&1 || cat licenses.log
     - name: Diagnose Network Connectivity
       run: |
         echo "Checking network connectivity..."
@@ -91,7 +91,7 @@ jobs:
         RETRY_DELAY=10
         for i in $(seq 1 $MAX_RETRIES); do
           echo "Attempt $i to install SDK platform tools..."
-          sudo $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "build-tools;34.0.0" "platforms;android-34" > platform_tools_install.log 2>&1 && break
+          sudo sh -x $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "build-tools;34.0.0" "platforms;android-34" > platform_tools_install.log 2>&1 && break
           cat platform_tools_install.log
           echo "Attempt $i failed, waiting $RETRY_DELAY seconds..."
           sleep $RETRY_DELAY
@@ -217,10 +217,13 @@ jobs:
         P4A_RELEASE_KEYALIAS_PASSWD: ${{ secrets.P4A_RELEASE_KEYALIAS_PASSWD }}
         P4A_RELEASE_KEYSTORE: ${{ secrets.P4A_RELEASE_KEYSTORE }}
         P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}
+        ANDROID_HOME: /usr/local/lib/android/sdk
+        ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
       name: Build APK
       run: "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds\
         \ -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE\
         \ -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\n\
+        export PATH=$PATH:/usr/local/lib/android/sdk/cmdline-tools/latest/bin:/usr/local/lib/android/sdk/platform-tools\n\
         buildozer android clean\nbuildozer -v android debug deploy 2>&1 | tee -a build.log\
         \ || echo \"Build failed but log generated\" >> build.log\nif [ ${PIPESTATUS[0]}\
         \ -ne 0 ]; then\n  cat build.log\n  exit 1\nfi"
@@ -229,15 +232,15 @@ jobs:
       run: "if [ -f build.log ]; then\n  echo \"Build log exists, checking for errors...\"\
         \n  if grep -q -E \"ERROR:|FAILED\" build.log;  then\n    echo \"Errors found\
         \ in build.log:\"\n    grep -E \"ERROR:|FAILED\" build.log\n    exit 1\n \
-        \ else\n    echo \"No critical errors found in build.log\"\n  fi\nelse\n \
-        \ echo \"No build log found\"\n  exit 1\nfi"
+        \ else\n    echo \"No critical errors found in build.log\"\n  fi\nelse\n  \
+        echo \"No build log found\"\n  exit 1\nfi"
     - if: always()
       name: Save Build Log
       uses: actions/upload-artifact@v4
       with:
         name: build-log
         path: build.log
-        retention-days: 1
+        retention-days: 2
     - if: success()
       name: Upload APK
       uses: actions/upload-artifact@v4
@@ -245,7 +248,7 @@ jobs:
         if-no-files-found: error
         name: weatherapp-apk
         path: bin/weatherapp-*.apk
-        retention-days: 1
+        retention-days: 2
     - name: Check Disk Space Before Build
       run: "echo \"Checking disk space before build...\"\ndf -h\ndu -h /tmp -d 1 --no-dereference\
         \ 2>/dev/null || echo \"\u65E0\u6CD5\u68C0\u67E5 /tmp \u76EE\u5F55\"\ndu -h\
