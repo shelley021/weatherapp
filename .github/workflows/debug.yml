@@ -57,7 +57,7 @@ jobs:
         echo "ANDROID_SDK_ROOT=/usr/local/lib/android/sdk"
         export ANDROID_HOME=/usr/local/lib/android/sdk
         export ANDROID_SDK_ROOT=/usr/local/lib/android/sdk
-        mkdir -p $ANDROID_HOME/cmdline-tools
+        sudo mkdir -p $ANDROID_HOME/cmdline-tools
         wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
         sudo unzip -q cmdline-tools.zip -d $ANDROID_HOME/cmdline-tools
         sudo mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
@@ -65,14 +65,15 @@ jobs:
         sudo chown -R runner:runner $ANDROID_HOME || echo "chown failed"
         rm cmdline-tools.zip
         echo "PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools" >> $GITHUB_ENV
+        java -version  # Debug: Verify Java environment
         ls -l $ANDROID_HOME/cmdline-tools/latest/bin  # Debug: Verify sdkmanager exists
         file $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager  # Debug: Check file type
         whoami  # Debug: Check user
         stat $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager  # Debug: Check permissions
         which sdkmanager  # Debug: Verify PATH
-        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --version || echo "sdkmanager version check failed"
+        sudo $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --version 2>&1 || echo "sdkmanager version check failed"
     - name: Accept Android SDK Licenses
-      run: yes | sudo $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+      run: yes | sudo $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses 2>&1 || true
     - name: Diagnose Network Connectivity
       run: |
         echo "Checking network connectivity..."
@@ -89,8 +90,8 @@ jobs:
         RETRY_DELAY=10
         for i in $(seq 1 $MAX_RETRIES); do
           echo "Attempt $i to install SDK platform tools..."
-          sudo $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "build-tools;34.0.0" "platforms;android-34" && break
-          echo "Attempt $i failed, waiting $RETRY_DELAY seconds"
+          sudo $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "build-tools;34.0.0" "platforms;android-34" 2>&1 && break
+          echo "Attempt $i failed, waiting $RETRY_DELAY seconds..."
           sleep $RETRY_DELAY
           if [ $i -eq $MAX_RETRIES ]; then
             echo "Failed to install SDK platform tools after $MAX_RETRIES attempts."
