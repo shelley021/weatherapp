@@ -1,3 +1,14 @@
+name: WeatherApp CI
+'on':
+  pull_request:
+    branches:
+    - main
+  push:
+    branches:
+    - main
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: Ubuntu-latest
@@ -199,18 +210,8 @@ jobs:
         \ 2>/dev/null || echo \"\u65E0\u6CD5\u68C0\u67E5 /tmp \u76EE\u5F55\"\ndu -h\
         \ $HOME -d 1 --no-dereference 2>/dev/null || echo \"\u65E0\u6CD5\u68C0\u67E5\
         \ $HOME \u76EE\u5F55\""
-    - - name: Check Network Connectivity
-        run: "ping -c 4 google.com || echo '\u7F51\u7EDC\u8FDE\u63A5\u5931\u8D25\uFF0C\
-          \u8BF7\u68C0\u67E5\u7F51\u7EDC'"
-name: WeatherApp CI
-'on':
-  pull_request:
-    branches:
-    - main
-  push:
-    branches:
-    - main
-permissions:
-  contents: write
+    - name: Check Network Connectivity
+      run: "ping -c 4 google.com || echo '\u7F51\u7EDC\u8FDE\u63A5\u5931\u8D25\uFF0C\
+        \u8BF7\u68C0\u67E5\u7F51\u7EDC'"
 
 # AutoDebug: Forced change at 2025-05-13T10:10:48.831892+00:00
