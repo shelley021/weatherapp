@@ -63,14 +63,19 @@ jobs:
         sudo mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
         sudo chmod +x $ANDROID_HOME/cmdline-tools/latest/bin/* || echo "chmod failed, checking permissions"
         sudo chown -R runner:runner $ANDROID_HOME || echo "chown failed"
+        sudo mkdir -p $ANDROID_HOME/tools/bin
+        sudo ln -s $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager $ANDROID_HOME/tools/bin/sdkmanager
+        sudo ln -s $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager $ANDROID_HOME/tools/bin/avdmanager
         rm cmdline-tools.zip
-        echo "PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools" >> $GITHUB_ENV
+        echo "PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools/bin" >> $GITHUB_ENV
         java -version  # Debug: Verify Java environment
         env | grep -E 'JAVA|ANDROID|PATH'  # Debug: Check environment variables
         ls -l $ANDROID_HOME/cmdline-tools/latest/bin  # Debug: Verify sdkmanager exists
+        ls -l $ANDROID_HOME/tools/bin  # Debug: Verify symlinks
         file $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager  # Debug: Check file type
         whoami  # Debug: Check user
         stat $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager  # Debug: Check permissions
+        stat $ANDROID_HOME/tools/bin/sdkmanager  # Debug: Check symlink permissions
         which sdkmanager  # Debug: Verify PATH
         sudo sh -x $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --version > sdkmanager_version.log 2>&1 || cat sdkmanager_version.log
     - name: Accept Android SDK Licenses
@@ -223,7 +228,7 @@ jobs:
       run: "export CFLAGS=\"-Wno-error=implicit-function-declaration -Wno-error=array-bounds\
         \ -Wno-error=deprecated-declarations\"\nexport CPPFLAGS=\"-D_GNU_SOURCE -D_DEFAULT_SOURCE\
         \ -D_XOPEN_SOURCE=700\"\nexport LDFLAGS=\"-lnsl -lresolv -lgssapi_krb5\"\n\
-        export PATH=$PATH:/usr/local/lib/android/sdk/cmdline-tools/latest/bin:/usr/local/lib/android/sdk/platform-tools\n\
+        export PATH=$PATH:/usr/local/lib/android/sdk/cmdline-tools/latest/bin:/usr/local/lib/android/sdk/platform-tools:/usr/local/lib/android/sdk/tools/bin\n\
         buildozer android clean\nbuildozer -v android debug deploy 2>&1 | tee -a build.log\
         \ || echo \"Build failed but log generated\" >> build.log\nif [ ${PIPESTATUS[0]}\
         \ -ne 0 ]; then\n  cat build.log\n  exit 1\nfi"
@@ -232,7 +237,7 @@ jobs:
       run: "if [ -f build.log ]; then\n  echo \"Build log exists, checking for errors...\"\
         \n  if grep -q -E \"ERROR:|FAILED\" build.log;  then\n    echo \"Errors found\
         \ in build.log:\"\n    grep -E \"ERROR:|FAILED\" build.log\n    exit 1\n \
-        \ else\n    echo \"No critical errors found in build.log\"\n  fi\nelse\n  \
+        \ else\n    echo \"No critical errors found in build.log\"\n  fi\nelse\n \
         echo \"No build log found\"\n  exit 1\nfi"
     - if: always()
       name: Save Build Log
