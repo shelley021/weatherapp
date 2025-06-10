@@ -14,11 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Set up JDK 8
+    - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
-        java-version: '8'
-        distribution: 'temurin'
+        distribution: temurin
+        java-version: '17'
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -53,12 +53,17 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
       with:
-        cmdline-tools-version: '8512546'
-    - name: Accept Android SDK Licenses
-      run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
-    - name: Install Android SDK Platform Tools
-      run: $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "build-tools;34.0.0" "platforms;android-34"
-    - name: Download Android NDK with Retry
+        packages: 'platforms;android-34 build-tools;34.0.0'
+    - name: Confirm environment
+      run: |
+        echo "JAVA_HOME=$JAVA_HOME"
+        echo "ANDROID_HOME=$ANDROID_HOME"
+        echo "PATH=$PATH"
+        which java
+        java -version
+    - name: Test sdkmanager
+      run: $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --version > sdkmanager_version.log 2>&1 || cat sdkmanager_version.log
+    - name: Download Android NDK r27c
       run: |
         NDK_URL="[invalid url, do not cite]
         NDK_PATH="$HOME/android-ndk-r27c.zip"
@@ -164,14 +169,11 @@ jobs:
         P4A_RELEASE_KEYALIAS_PASSWD: ${{ secrets.P4A_RELEASE_KEYALIAS_PASSWD }}
         P4A_RELEASE_KEYSTORE: ${{ secrets.P4A_RELEASE_KEYSTORE }}
         P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}
-        ANDROID_HOME: /usr/local/lib/android/sdk
-        ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
       name: Build APK
       run: |
         export CFLAGS="-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations"
         export CPPFLAGS="-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700"
         export LDFLAGS="-lnsl -lresolv -lgssapi_krb5"
-        export PATH=$PATH:/usr/local/lib/android/sdk/cmdline-tools/latest/bin:/usr/local/lib/android/sdk/platform-tools:/usr/local/lib/android/sdk/tools/bin
         buildozer android clean
         buildozer -v android debug deploy 2>&1 | tee -a build.log || echo "Build failed but log generated" >> build.log
         if [ ${PIPESTATUS[0]} -ne 0 ]; then
@@ -191,27 +193,3 @@ jobs:
         name: weatherapp-apk
         path: bin/weatherapp-*.apk
         retention-days: 2
-    - name: Check Disk Space Before Build
-      run: |
-        echo "Checking disk space before build..."
-        df -h
-        du -h /tmp -d 1 --no-dereference 2>/dev/null || echo "Unable to check /tmp directory"
-        du -h $HOME -d 1 --no-dereference 2>/dev/null || echo "Unable to check $HOME directory"
-    - name: Clean Disk Space
-      run: |
-        echo "Cleaning disk space..."
-        rm -rf /tmp/* || true
-        rm -rf $HOME/.cache || true
-        sudo apt-get clean
-        docker system prune -a --force
-    - name: Initial Trigger Step
-      run: echo 'Initial trigger to start a new workflow'
-    - name: Check Disk Space After Build
-      run: |
-        echo "Checking disk space after build..."
-        df -h
-        du -h /tmp -d 1 --no-dereference 2>/dev/null || echo "Unable to check /tmp directory"
-        du -h $HOME -d 1 --no-dereference 2>/dev/null || echo "Unable to check $HOME directory"
-    - name: Check Network Connectivity
-      run: |
-        ping -c 4 google.com || echo 'Network connection failed, please check network'
