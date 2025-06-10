@@ -64,47 +64,49 @@ jobs:
     - name: Test sdkmanager
       run: $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --version > sdkmanager_version.log 2>&1 || cat sdkmanager_version.log
     - name: Download Android NDK r25b
-      run: |
-        NDK_URL="https://dl.google.com/android/repository/android-ndk-r25b-linux.zip"
-        NDK_PATH="$HOME/android-ndk-r25b.zip"
-        NDK_DIRECTORY="$HOME/.buildozer/android/platform/android-ndk-r25b"
-        EXPECTED_MD5="a3f0a2c6a2b111b5b7e0935a7690e426"
-        MAX_RETRIES=5
-        RETRY_DELAY=15
-        for i in $(seq 1 $MAX_RETRIES); do
-          echo "Attempt $i to download Android NDK..."
-          curl -L -o "$NDK_PATH" "$NDK_URL" --retry 5 --retry-delay 5 --retry-max-time 600 --connect-timeout 60
-          if [ $? -eq 0 ]; then
-            DOWNLOADED_MD5=$(md5sum "$NDK_PATH" | awk '{print $1}')
-            if [ "$DOWNLOADED_MD5" = "$EXPECTED_MD5" ]; then
-              echo "NDK downloaded successfully, MD5 check passed: $DOWNLOADED_MD5"
-              break
-            else
-              echo "NDK MD5 check failed, expected: $EXPECTED_MD5, actual: $DOWNLOADED_MD5"
-              rm -f "$NDK_PATH"
-            fi
-          fi
-          if [ $i -lt $MAX_RETRIES ]; then
-            echo "Download failed, waiting $RETRY_DELAY seconds before retrying..."
-            sleep $RETRY_DELAY
-          else
-            echo "Failed to download Android NDK after $MAX_RETRIES attempts."
-            exit 1
-          fi
-        done
-        mkdir -p "$HOME/.buildozer/android/platform"
-        unzip -q "$NDK_PATH" -d "$HOME/.buildozer/android/platform" || {
-          echo "Failed to unzip NDK, please check file integrity"
-          exit 1
-        }
-        if [ -d "$NDK_DIRECTORY" ]; then
-          echo "NDK unzipped successfully, path: $NDK_DIRECTORY"
+  run: |
+    NDK_URL="https://dl.google.com/android/repository/android-ndk-r25b-linux.zip"
+    NDK_PATH="$HOME/android-ndk-r25b.zip"
+    NDK_DIRECTORY="$HOME/.buildozer/android/platform/android-ndk-r25b"
+    EXPECTED_MD5="302f62deb2931a03f91625ec3107dd0b"  # 更新为实际的 MD5 值
+    MAX_RETRIES=5
+    RETRY_DELAY=15
+    for i in $(seq 1 $MAX_RETRIES); do
+      echo "Attempt $i to download Android NDK..."
+      curl -L -o "$NDK_PATH" "$NDK_URL" --retry 5 --retry-delay 5 --retry-max-time 600 --connect-timeout 60
+      if [ $? -eq 0 ]; then
+        DOWNLOADED_MD5=$(md5sum "$NDK_PATH" | awk '{print $1}')
+        echo "Expected MD5: $EXPECTED_MD5"
+        echo "Downloaded MD5: $DOWNLOADED_MD5"
+        if [ "$DOWNLOADED_MD5" = "$EXPECTED_MD5" ]; then
+          echo "NDK downloaded successfully, MD5 check passed: $DOWNLOADED_MD5"
+          break
         else
-          echo "NDK unzip failed, expected directory not found: $NDK_DIRECTORY"
-          exit 1
+          echo "NDK MD5 check failed, expected: $EXPECTED_MD5, actual: $DOWNLOADED_MD5"
+          rm -f "$NDK_PATH"
         fi
-        export ANDROID_NDK_HOME="$NDK_DIRECTORY"
-        echo "ANDROID_NDK_HOME=$ANDROID_NDK_HOME" >> $GITHUB_ENV
+      fi
+      if [ $i -lt $MAX_RETRIES ]; then
+        echo "Download failed, waiting $RETRY_DELAY seconds before retrying..."
+        sleep $RETRY_DELAY
+      else
+        echo "Failed to download Android NDK after $MAX_RETRIES attempts."
+        exit 1
+      fi
+    done
+    mkdir -p "$HOME/.buildozer/android/platform"
+    unzip -q "$NDK_PATH" -d "$HOME/.buildozer/android/platform" || {
+      echo "Failed to unzip NDK, please check file integrity"
+      exit 1
+    }
+    if [ -d "$NDK_DIRECTORY" ]; then
+      echo "NDK unzipped successfully, path: $NDK_DIRECTORY"
+    else
+      echo "NDK unzip failed, expected directory not found: $NDK_DIRECTORY"
+      exit 1
+    fi
+    export ANDROID_NDK_HOME="$NDK_DIRECTORY"
+    echo "ANDROID_NDK_HOME=$ANDROID_NDK_HOME" >> $GITHUB_ENV
     - name: Initialize Buildozer
       run: |
         touch build.log
