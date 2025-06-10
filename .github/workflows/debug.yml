@@ -53,27 +53,22 @@ jobs:
     - name: Set up Android SDK
       uses: android-actions/setup-android@v3
       with:
-        accept-android-sdk-licenses: true
-        cmdline-tools-version: latest
-        packages: build-tools;34.0.0 platform-tools platforms;android-34
-    - name: Create symlink for sdkmanager
+        packages: 'platforms;android-34 build-tools;34.0.0'
+    - name: Confirm environment
       run: |
-        sudo mkdir -p $ANDROID_HOME/tools/bin
-        sudo ln -sf $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager $ANDROID_HOME/tools/bin/sdkmanager
-    - name: Check sdkmanager path
-      run: |
-        echo "Checking $ANDROID_HOME/tools/bin/sdkmanager"
-        ls -l $ANDROID_HOME/tools/bin/sdkmanager
-        echo "Checking $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
-        ls -l $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager
+        echo "JAVA_HOME=$JAVA_HOME"
+        echo "ANDROID_HOME=$ANDROID_HOME"
+        echo "PATH=$PATH"
+        which java
+        java -version
     - name: Test sdkmanager
-      run: $ANDROID_HOME/tools/bin/sdkmanager --version > sdkmanager_version.log 2>&1 || cat sdkmanager_version.log
-    - name: Download Android NDK r27c
+      run: $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --version > sdkmanager_version.log 2>&1 || cat sdkmanager_version.log
+    - name: Download Android NDK r25b
       run: |
-        NDK_URL="https://dl.google.com/android/repository/android-ndk-r27c-linux.zip"
-        NDK_PATH="$HOME/android-ndk-r27c.zip"
-        NDK_DIRECTORY="$HOME/.buildozer/android/platform/android-ndk-r27c"
-        EXPECTED_MD5="52f5ef6a8eea8426c9748fb29bba85cc"
+        NDK_URL="https://dl.google.com/android/repository/android-ndk-r25b-linux.zip"
+        NDK_PATH="$HOME/android-ndk-r25b.zip"
+        NDK_DIRECTORY="$HOME/.buildozer/android/platform/android-ndk-r25b"
+        EXPECTED_MD5="a3f0a2c6a2b111b5b7e0935a7690e426"
         MAX_RETRIES=5
         RETRY_DELAY=15
         for i in $(seq 1 $MAX_RETRIES); do
@@ -126,8 +121,8 @@ jobs:
         android.permissions = INTERNET
         android.api = 34
         android.minapi = 21
-        android.ndk = 27c
-        android.ndk_path = /home/runner/.buildozer/android/platform/android-ndk-r27c
+        android.ndk = 25b
+        android.ndk_path = /home/runner/.buildozer/android/platform/android-ndk-r25b
         android.sdk_path = /usr/local/lib/android/sdk
         android.accept_sdk_license = True
         orientation = portrait
@@ -176,12 +171,16 @@ jobs:
         P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}
       name: Build APK
       run: |
+        echo "Starting build process..." | tee -a build.log
         export CFLAGS="-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations"
         export CPPFLAGS="-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700"
         export LDFLAGS="-lnsl -lresolv -lgssapi_krb5"
-        buildozer android clean
+        echo "Environment variables set." | tee -a build.log
+        echo "ANDROID_NDK_HOME=$ANDROID_NDK_HOME" | tee -a build.log
+        buildozer android clean 2>&1 | tee -a build.log
         buildozer -v android debug deploy 2>&1 | tee -a build.log || echo "Build failed but log generated" >> build.log
         if [ ${PIPESTATUS[0]} -ne 0 ]; then
+          echo "Build failed. Check build.log for details." | tee -a build.log
           cat build.log
           exit 1
         fi
