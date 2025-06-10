@@ -193,6 +193,7 @@ jobs:
           exit 1
         }
     - name: Save Build Log
+      if: always()  # 无论成功或失败都执行
       uses: actions/upload-artifact@v4
       with:
         name: build-log
