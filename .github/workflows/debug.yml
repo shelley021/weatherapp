@@ -166,17 +166,44 @@ jobs:
         ls -l $OPENSSL_CACHE
     - name: Pre-Download Python 3.10.6 Source
       run: |
-        PYTHON_URL="https://www.python.org/ftp/python/3.10.6/Python-3.10.6.tar.xz"
+        PRIMARY_URL="https://www.python.org/ftp/python/3.10.6/Python-3.10.6.tar.xz"
+        FALLBACK_URL="https://mirror.niser.ac.in/python/ftp/python/3.10.6/Python-3.10.6.tar.xz"
         PYTHON_CACHE="/home/runner/.buildozer/cache"
+        PYTHON_FILE="$PYTHON_CACHE/Python-3.10.6.tar.xz"
         mkdir -p $PYTHON_CACHE
         MAX_RETRIES=5
-        RETRY_DELAY=15
+        RETRY_DELAY=10
+        EXPECTED_SIZE=18655036  # Expected file size in bytes (~18.6 MB)
         for i in $(seq 1 $MAX_RETRIES); do
-          echo "Attempt $i to download Python 3.10.6 source..."
-          curl -L -o $PYTHON_CACHE/Python-3.10.6.tar.xz "$PYTHON_URL" --retry 5 --retry-delay 5 --retry-max-time 60 --connect-timeout 30
+          echo "Attempt $i to download Python 3.10.6 source from primary URL..."
+          curl -L -o "$PYTHON_FILE" "$PRIMARY_URL" --retry 5 --retry-delay 10 --retry-max-time 120 --connect-timeout 30
           if [ $? -eq 0 ]; then
-            echo "Python 3.10.6 source downloaded successfully."
-            break
+            if [ -f "$PYTHON_FILE" ]; then
+              DOWNLOADED_SIZE=$(stat -c%s "$PYTHON_FILE")
+              echo "Downloaded file size: $DOWNLOADED_SIZE bytes"
+              if [ "$DOWNLOADED_SIZE" -eq "$EXPECTED_SIZE" ]; then
+                echo "Python 3.10.6 source downloaded successfully from primary URL."
+                break
+              else
+                echo "File size check failed, expected: $EXPECTED_SIZE, actual: $DOWNLOADED_SIZE"
+                rm -f "$PYTHON_FILE"
+              fi
+            fi
+          fi
+          echo "Primary URL failed, trying fallback URL..."
+          curl -L -o "$PYTHON_FILE" "$FALLBACK_URL" --retry 5 --retry-delay 10 --retry-max-time 120 --connect-timeout 30
+          if [ $? -eq 0 ]; then
+            if [ -f "$PYTHON_FILE" ]; then
+              DOWNLOADED_SIZE=$(stat -c%s "$PYTHON_FILE")
+              echo "Downloaded file size: $DOWNLOADED_SIZE bytes"
+              if [ "$DOWNLOADED_SIZE" -eq "$EXPECTED_SIZE" ]; then
+                echo "Python 3.10.6 source downloaded successfully from fallback URL."
+                break
+              else
+                echo "File size check failed, expected: $EXPECTED_SIZE, actual: $DOWNLOADED_SIZE"
+                rm -f "$PYTHON_FILE"
+              fi
+            fi
           fi
           if [ $i -lt $MAX_RETRIES ]; then
             echo "Download failed, waiting $RETRY_DELAY seconds before retrying..."
