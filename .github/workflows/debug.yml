@@ -179,26 +179,19 @@ jobs:
         P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}
       name: Build APK
       run: |
+        set -o pipefail  # 确保管道中的错误被捕获
         echo "Starting build process..." | tee -a build.log
-        echo "Environment variables:" | tee -a build.log
-        env | tee -a build.log
         export CFLAGS="-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations"
         export CPPFLAGS="-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700"
         export LDFLAGS="-lnsl -lresolv -lgssapi_krb5"
-        echo "Environment variables set:" | tee -a build.log
-        echo "CFLAGS=$CFLAGS" | tee -a build.log
-        echo "CPPFLAGS=$CPPFLAGS" | tee -a build.log
-        echo "LDFLAGS=$LDFLAGS" | tee -a build.log
+        echo "Environment variables set." | tee -a build.log
         echo "ANDROID_NDK_HOME=$ANDROID_NDK_HOME" | tee -a build.log
-        echo "Running buildozer android clean..." | tee -a build.log
         buildozer android clean 2>&1 | tee -a build.log
-        echo "Running buildozer -v android debug deploy..." | tee -a build.log
-        buildozer -v android debug deploy 2>&1 | tee -a build.log || echo "Build failed" >> build.log
-        if [ ${PIPESTATUS[0]} -ne 0 ]; then
+        buildozer -v android debug deploy 2>&1 | tee -a build.log || {
           echo "Build failed. Check build.log for details." | tee -a build.log
           cat build.log
           exit 1
-        fi
+        }
     - name: Save Build Log
       uses: actions/upload-artifact@v4
       with:
