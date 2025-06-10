@@ -65,7 +65,7 @@ jobs:
       run: $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --version > sdkmanager_version.log 2>&1 || cat sdkmanager_version.log
     - name: Download Android NDK r27c
       run: |
-        NDK_URL="[invalid url, do not cite]
+        NDK_URL="https://dl.google.com/android/repository/android-ndk-r27c-linux.zip"
         NDK_PATH="$HOME/android-ndk-r27c.zip"
         NDK_DIRECTORY="$HOME/.buildozer/android/platform/android-ndk-r27c"
         EXPECTED_MD5="52f5ef6a8eea8426c9748fb29bba85cc"
@@ -138,7 +138,7 @@ jobs:
         git checkout master
     - name: Pre-Download OpenSSL
       run: |
-        OPENSSL_URL="[invalid url, do not cite]
+        OPENSSL_URL="https://www.openssl.org/source/openssl-3.0.15.tar.gz"
         OPENSSL_CACHE="/home/runner/.buildozer/cache"
         mkdir -p $OPENSSL_CACHE
         MAX_RETRIES=3
