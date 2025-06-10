@@ -3,6 +3,8 @@ on:
   push:
     branches:
     - main
+    paths-ignore:
+      - 'buildlog/build.log'  # 忽略 build.log 文件的更改
   pull_request:
     branches:
     - main
@@ -162,6 +164,29 @@ jobs:
           fi
         done
         ls -l $OPENSSL_CACHE
+    - name: Pre-Download Python 3.10.6 Source
+      run: |
+        PYTHON_URL="https://www.python.org/ftp/python/3.10.6/Python-3.10.6.tar.xz"
+        PYTHON_CACHE="/home/runner/.buildozer/cache"
+        mkdir -p $PYTHON_CACHE
+        MAX_RETRIES=5
+        RETRY_DELAY=15
+        for i in $(seq 1 $MAX_RETRIES); do
+          echo "Attempt $i to download Python 3.10.6 source..."
+          curl -L -o $PYTHON_CACHE/Python-3.10.6.tar.xz "$PYTHON_URL" --retry 5 --retry-delay 5 --retry-max-time 60 --connect-timeout 30
+          if [ $? -eq 0 ]; then
+            echo "Python 3.10.6 source downloaded successfully."
+            break
+          fi
+          if [ $i -lt $MAX_RETRIES ]; then
+            echo "Download failed, waiting $RETRY_DELAY seconds before retrying..."
+            sleep $RETRY_DELAY
+          else
+            echo "Failed to download Python 3.10.6 source after $MAX_RETRIES attempts."
+            exit 1
+          fi
+        done
+        ls -l $PYTHON_CACHE
     - name: Set Custom Temp Directory
       run: |
         mkdir -p $HOME/tmp
