@@ -58,53 +58,37 @@ jobs:
         export ANDROID_HOME=/usr/local/lib/android/sdk
         export ANDROID_SDK_ROOT=/usr/local/lib/android/sdk
         sudo mkdir -p $ANDROID_HOME/cmdline-tools
-        wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
+        wget -q https://dl.google.com/android/repository/commandlinetools-linux-9123335_latest.zip -O cmdline-tools.zip
         sudo unzip -q cmdline-tools.zip -d $ANDROID_HOME/cmdline-tools
         sudo mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-        sudo chmod +x $ANDROID_HOME/cmdline-tools/latest/bin/* || echo "chmod failed, checking permissions"
+        sudo chmod +x $ANDROID_HOME/cmdline-tools/latest/bin/* || echo "chmod failed"
         sudo chown -R runner:runner $ANDROID_HOME || echo "chown failed"
         sudo mkdir -p $ANDROID_HOME/tools/bin
-        sudo ln -s $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager $ANDROID_HOME/tools/bin/sdkmanager
-        sudo ln -s $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager $ANDROID_HOME/tools/bin/avdmanager
+        sudo ln -sf $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager $ANDROID_HOME/tools/bin/sdkmanager
+        sudo ln -sf $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager $ANDROID_HOME/tools/bin/avdmanager
+        sudo chown runner:runner $ANDROID_HOME/tools/bin/sdkmanager
+        sudo chown runner:runner $ANDROID_HOME/tools/bin/avdmanager
         rm cmdline-tools.zip
         echo "PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools/bin" >> $GITHUB_ENV
-        java -version  # Debug: Verify Java environment
-        env | grep -E 'JAVA|ANDROID|PATH'  # Debug: Check environment variables
-        ls -l $ANDROID_HOME/cmdline-tools/latest/bin  # Debug: Verify sdkmanager exists
-        ls -l $ANDROID_HOME/tools/bin  # Debug: Verify symlinks
-        file $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager  # Debug: Check file type
-        whoami  # Debug: Check user
-        stat $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager  # Debug: Check permissions
-        stat $ANDROID_HOME/tools/bin/sdkmanager  # Debug: Check symlink permissions
-        which sdkmanager  # Debug: Verify PATH
-        sudo sh -x $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --version > sdkmanager_version.log 2>&1 || cat sdkmanager_version.log
+        java -version
+        env | grep -E 'JAVA|ANDROID|PATH'
+        ls -l $ANDROID_HOME/cmdline-tools/latest/bin
+        ls -l $ANDROID_HOME/tools/bin
+        file $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager
+        whoami
+        stat $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager
+        stat $ANDROID_HOME/tools/bin/sdkmanager
+        which sdkmanager
+        sudo -u runner sh -x $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --version > sdkmanager_version.log 2>&1 || cat sdkmanager_version.log
     - name: Accept Android SDK Licenses
-      run: yes | sudo sh -x $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > licenses.log 2>&1 || cat licenses.log
-    - name: Diagnose Network Connectivity
-      run: |
-        echo "Checking network connectivity..."
-        ping -c 4 dl.google.com || echo "Cannot ping dl.google.com"
-        curl -I https://dl.google.com/android/repository/android-ndk-r27c-linux.zip || echo "Cannot reach NDK URL"
-        ping -c 4 www.openssl.org || echo "Cannot ping www.openssl.org"
-    - name: Install Android SDK Platform Tools with Retry
+      run: yes | sudo -u runner sh -x $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > licenses.log 2>&1 || cat licenses.log
+    - name: Install Android SDK Platform Tools
       run: |
         echo "ANDROID_HOME=$ANDROID_HOME"
         echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
         export ANDROID_HOME=/usr/local/lib/android/sdk
         export ANDROID_SDK_ROOT=/usr/local/lib/android/sdk
-        MAX_RETRIES=3
-        RETRY_DELAY=10
-        for i in $(seq 1 $MAX_RETRIES); do
-          echo "Attempt $i to install SDK platform tools..."
-          sudo sh -x $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "build-tools;34.0.0" "platforms;android-34" > platform_tools_install.log 2>&1 && break
-          cat platform_tools_install.log
-          echo "Attempt $i failed, waiting $RETRY_DELAY seconds..."
-          sleep $RETRY_DELAY
-          if [ $i -eq $MAX_RETRIES ]; then
-            echo "Failed to install SDK platform tools after $MAX_RETRIES attempts."
-            exit 1
-          fi
-        done
+        sudo -u runner sh -x $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "build-tools;34.0.0" "platforms;android-34" > platform_tools_install.log 2>&1 || cat platform_tools_install.log
     - name: Download Android NDK with Retry
       run: "NDK_URL=\"https://dl.google.com/android/repository/android-ndk-r27c-linux.zip\"\
         \nNDK_PATH=\"$HOME/android-ndk-r27c.zip\"\nNDK_DIRECTORY=\"$HOME/.buildozer/android/platform/android-ndk-r27c\"\
@@ -124,57 +108,36 @@ jobs:
         \u8F7D Android NDK \u5931\u8D25\uFF0C\u9000\u51FA...\"\n    exit 1\n  fi\n\
         done\nmkdir -p \"$HOME/.buildozer/android/platform\"\nunzip -q \"$NDK_PATH\"\
         \ -d \"$HOME/.buildozer/android/platform\" || {\n  echo \"\u89E3\u538B NDK\
-        \ \u5931\u8D25\uFF0C\u8BF7\u68C0\u67E5\u6587\u4EF6\u5b8c\u6574\u6027\"\n \
+        \ \u5931\u8D25\uFF0C\u8BF7\u68C0\u67E5\u6587\u4EF6\u5B8C\u6574\u6027\"\n \
         exit 1\n}\nif [ -d \"$NDK_DIRECTORY\" ]; then\n  echo \"NDK \u89E3\u538B\
         \u6210\u529F\uFF0C\u8DEF\u5F84\uFF1A$NDK_DIRECTORY\"\nelse\n  echo \"NDK\
-        \ \u89E3\u538B\u5931\u8D25\uFF0C\u672a\u627E\u5230\u9884\u671F\u76EE\u5F55\
+        \ \u89E3\u538B\u5931\u8D25\uFF0C\u672A\u627E\u5230\u9884\u671F\u76EE\u5F55\
         \uFF1A$NDK_DIRECTORY\"\n  exit 1\nfi\nexport ANDROID_NDK_HOME=\"$NDK_DIRECTORY\"\
         \necho \"ANDROID_NDK_HOME=$ANDROID_NDK_HOME\" >> $GITHUB_ENV"
     - name: Initialize Buildozer
       run: |
-        touch build.log  # Ensure build.log exists for debugging
+        touch build.log
         buildozer init
-
         cat << 'EOF' > buildozer.spec
-
         [app]
-
         title = WeatherApp
-
         package.name = weatherapp
-
         package.domain = org.weatherpkg
-
         source.dir = .
-
         source.include_exts = py,png,jpg,kv,atlas
-
         version = 0.1
-
         requirements = python3,kivy==2.3.1,requests==2.25.1,certifi
-
         android.permissions = INTERNET
-
         android.api = 34
-
         android.minapi = 21
-
         android.ndk = 27c
-
         android.ndk_path = /home/runner/.buildozer/android/platform/android-ndk-r27c
-
         android.sdk_path = /usr/local/lib/android/sdk
-
         android.accept_sdk_license = True
-
         orientation = portrait
-
         fullscreen = 1
-
         log_level = 2
-
         p4a.branch = master
-
         EOF
     - name: Prepare python-for-android
       run: 'mkdir -p .buildozer/android/platform
@@ -281,5 +244,3 @@ jobs:
     - name: Check Network Connectivity
       run: "ping -c 4 google.com || echo '\u7F51\u7EDC\u8FDE\u63A5\u5931\u8D25\uFF0C\
         \u8BF7\u68C0\u67E5\u7F51\u7EDC'"
-
-# AutoDebug: Forced change at 2025-05-13T10:10:48.831892+00:00
