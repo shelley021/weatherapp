@@ -63,12 +63,18 @@ jobs:
         java -version
     - name: Test sdkmanager
       run: $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --version > sdkmanager_version.log 2>&1 || cat sdkmanager_version.log
+    - name: Create sdkmanager symlink
+      run: |
+        sudo mkdir -p $ANDROID_HOME/tools/bin
+        sudo ln -sf $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager $ANDROID_HOME/tools/bin/sdkmanager
+        ls -l $ANDROID_HOME/tools/bin/sdkmanager
+        echo "Symlink created for sdkmanager"
     - name: Download Android NDK r25b
       run: |
         NDK_URL="https://dl.google.com/android/repository/android-ndk-r25b-linux.zip"
         NDK_PATH="$HOME/android-ndk-r25b.zip"
         NDK_DIRECTORY="$HOME/.buildozer/android/platform/android-ndk-r25b"
-        EXPECTED_MD5="302f62deb2931a03f91625ec3107dd0b"  # 更新为实际的 MD5 值
+        EXPECTED_MD5="302f62deb2931a03f91625ec3107dd0b"
         MAX_RETRIES=5
         RETRY_DELAY=15
         for i in $(seq 1 $MAX_RETRIES); do
