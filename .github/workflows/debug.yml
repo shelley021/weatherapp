@@ -50,19 +50,24 @@ jobs:
         python -m pip install --upgrade pip setuptools
         pip install buildozer==1.5.0 kivy==2.3.1 requests==2.25.1 cython==0.29.36 certifi
         pip install python-for-android
-    - name: Setup Android SDK
+    - name: Set up Android SDK
       uses: android-actions/setup-android@v3
       with:
-        packages: 'platforms;android-34 build-tools;34.0.0'
-    - name: Confirm environment
+        accept-android-sdk-licenses: true
+        cmdline-tools-version: latest
+        packages: build-tools;34.0.0 platform-tools platforms;android-34
+    - name: Create symlink for sdkmanager
       run: |
-        echo "JAVA_HOME=$JAVA_HOME"
-        echo "ANDROID_HOME=$ANDROID_HOME"
-        echo "PATH=$PATH"
-        which java
-        java -version
+        sudo mkdir -p $ANDROID_HOME/tools/bin
+        sudo ln -sf $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager $ANDROID_HOME/tools/bin/sdkmanager
+    - name: Check sdkmanager path
+      run: |
+        echo "Checking $ANDROID_HOME/tools/bin/sdkmanager"
+        ls -l $ANDROID_HOME/tools/bin/sdkmanager
+        echo "Checking $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+        ls -l $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager
     - name: Test sdkmanager
-      run: $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --version > sdkmanager_version.log 2>&1 || cat sdkmanager_version.log
+      run: $ANDROID_HOME/tools/bin/sdkmanager --version > sdkmanager_version.log 2>&1 || cat sdkmanager_version.log
     - name: Download Android NDK r27c
       run: |
         NDK_URL="https://dl.google.com/android/repository/android-ndk-r27c-linux.zip"
@@ -145,7 +150,7 @@ jobs:
         RETRY_DELAY=10
         for i in $(seq 1 $MAX_RETRIES); do
           echo "Attempt $i to download OpenSSL..."
-          curl -L -o $OPENSSL_CACHE/openssl-3.0.15.tar.gz $OPENSSL_URL && break
+          curl -L -o $OPENSSL_CACHE/openssl-3.0.15.tar.gz "$OPENSSL_URL" && break
           echo "Attempt $i failed, waiting $RETRY_DELAY seconds..."
           sleep $RETRY_DELAY
           if [ $i -eq $MAX_RETRIES ]; then
