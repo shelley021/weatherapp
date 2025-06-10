@@ -1,3 +1,27 @@
+Starting build process...
+Environment variables set.
+ANDROID_NDK_HOME=/home/runner/.buildozer/android/platform/android-ndk-r25b
+# Check configuration tokens
+# Ensure build layout
+# Create directory /home/runner/work/weatherapp/weatherapp/bin
+# Create directory /home/runner/work/weatherapp/weatherapp/.buildozer/applibs
+# Create directory /home/runner/.buildozer/android/platform/android/platform
+# Create directory /home/runner/work/weatherapp/weatherapp/.buildozer/android/app
+# Check configuration tokens
+# Run ['/opt/hostedtoolcache/Python/3.10.17/x64/bin/python', '-m', 'pythonforandroid.toolchain', 'clean_builds', '--color=always', '--storage-dir=/home/runner/work/weatherapp/weatherapp/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a', '--ndk-api=21', '--ignore-setup-py', '--debug']
+# Cwd /home/runner/work/weatherapp/weatherapp/.buildozer/android/platform/python-for-android
+[WARNING]: prerequisites.py is experimental and does not support all prerequisites yet.
+[WARNING]: Please report any issues to the python-for-android issue tracker.
+[WARNING]: prerequisites.py is experimental and does not support all prerequisites yet.
+[WARNING]: Please report any issues to the python-for-android issue tracker.
+[1m[90m[DEBUG][39m[0m:   Create directory /home/runner/work/weatherapp/weatherapp/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/python-installs
+[1m[90m[DEBUG][39m[0m:   Remove directory and subdirectory /home/runner/work/weatherapp/weatherapp/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a/build/python-installs
+# Run ['/opt/hostedtoolcache/Python/3.10.17/x64/bin/python', '-m', 'pythonforandroid.toolchain', 'clean_dists', '--color=always', '--storage-dir=/home/runner/work/weatherapp/weatherapp/.buildozer/android/platform/build-arm64-v8a_armeabi-v7a', '--ndk-api=21', '--ignore-setup-py', '--debug']
+# Cwd /home/runner/work/weatherapp/weatherapp/.buildozer/android/platform/python-for-android
+[WARNING]: prerequisites.py is experimental and does not support all prerequisites yet.
+[WARNING]: Please report any issues to the python-for-android issue tracker.
+[WARNING]: prerequisites.py is experimental and does not support all prerequisites yet.
+[WARNING]: Please report any issues to the python-for-android issue tracker.
 # Check configuration tokens
 # Ensure build layout
 # Check configuration tokens
@@ -27,12 +51,81 @@ Cloning into 'python-for-android'...
 # Cwd None
 # Android ANT is missing, downloading
 # Downloading https://archive.apache.org/dist/ant/binaries/apache-ant-1.9.4-bin.tar.gz
-# Run ['tar', 'xzf', 'apache-ant-1.9.4-bin.tar.gz']
-# Cwd /home/runner/.buildozer/android/platform/apache-ant-1.9.4
-# Apache ANT installation done.
-# Android SDK found at /usr/local/lib/android/sdk
-# Android NDK found at /home/runner/.buildozer/android/platform/android-ndk-r27c
-# Recommended android's NDK version by p4a is: 25b
-# Installing/updating SDK platform tools if necessary
-# Check configuration tokens
-# sdkmanager path "/usr/local/lib/android/sdk/tools/bin/sdkmanager" does not exist, sdkmanager is notinstalled
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/urllib/request.py", line 1787, in open
+    return getattr(self, name)(url)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/urllib/request.py", line 1996, in open_https
+    return self._open_generic_http(self._https_connection, url, data)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/urllib/request.py", line 1945, in _open_generic_http
+    http_conn.request("GET", selector, headers=headers)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 1283, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 1329, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 1278, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 1038, in _send_output
+    self.send(msg)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 976, in send
+    self.connect()
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 1448, in connect
+    super().connect()
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 942, in connect
+    self.sock = self._create_connection(
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/socket.py", line 857, in create_connection
+    raise err
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/socket.py", line 845, in create_connection
+    sock.connect(sa)
+OSError: [Errno 101] Network is unreachable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/bin/buildozer", line 8, in <module>
+    sys.exit(main())
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/buildozer/scripts/client.py", line 13, in main
+    Buildozer().run_command(sys.argv[1:])
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/buildozer/__init__.py", line 1024, in run_command
+    self.target.run_commands(args)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/buildozer/target.py", line 93, in run_commands
+    func(args)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/buildozer/target.py", line 103, in cmd_debug
+    self.buildozer.prepare_for_build()
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/buildozer/__init__.py", line 172, in prepare_for_build
+    self.target.install_platform()
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/buildozer/targets/android.py", line 613, in install_platform
+    self._install_apache_ant()
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/buildozer/targets/android.py", line 348, in _install_apache_ant
+    self.buildozer.download(url,
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/buildozer/__init__.py", line 658, in download
+    urlretrieve(url, filename, report_hook)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/urllib/request.py", line 1821, in retrieve
+    fp = self.open(url, data)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/urllib/request.py", line 1793, in open
+    raise OSError('socket error', msg).with_traceback(sys.exc_info()[2])
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/urllib/request.py", line 1787, in open
+    return getattr(self, name)(url)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/urllib/request.py", line 1996, in open_https
+    return self._open_generic_http(self._https_connection, url, data)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/urllib/request.py", line 1945, in _open_generic_http
+    http_conn.request("GET", selector, headers=headers)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 1283, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 1329, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 1278, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 1038, in _send_output
+    self.send(msg)
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 976, in send
+    self.connect()
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 1448, in connect
+    super().connect()
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/http/client.py", line 942, in connect
+    self.sock = self._create_connection(
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/socket.py", line 857, in create_connection
+    raise err
+  File "/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/socket.py", line 845, in create_connection
+    sock.connect(sa)
+OSError: [Errno socket error] [Errno 101] Network is unreachable
+Build failed. Check build.log for details.
