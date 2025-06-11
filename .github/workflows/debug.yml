@@ -4,7 +4,7 @@ on:
     branches:
     - main
     paths-ignore:
-      - 'buildlog/build.log'  # 忽略 build.log 文件的更改
+      - 'buildlog/build.log'  # 忽略 build.log 文件的更改 1
   pull_request:
     branches:
     - main
