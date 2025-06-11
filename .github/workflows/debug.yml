@@ -67,7 +67,7 @@ jobs:
         pip install buildozer==1.5.0 kivy==2.3.1 requests==2.25.1 cython==0.29.36 certifi
         pip install python-for-android
     - name: Set up Android SDK
-      uses: actions/setup-android@v3
+      uses: android-actions/setup-android@v3
       with:
         packages: 'platforms;android-34 build-tools;34.0.0'
     - name: Confirm environment
