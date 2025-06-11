@@ -233,6 +233,7 @@ jobs:
         P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}
       name: Build APK
       run: |
+        set -x
         buildozer -v android debug deploy --log-level 2
         set -o pipefail  # 确保管道中的错误被捕获
         echo "Starting build process..." | tee -a build.log
@@ -247,6 +248,10 @@ jobs:
           cat build.log
           exit 1
         }
+
+    - name: Check disk space
+      run: df -h
+
     - name: Save Build Log
       if: always()  # 无论成功或失败都执行
       uses: actions/upload-artifact@v4
