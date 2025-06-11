@@ -173,7 +173,7 @@ jobs:
         mkdir -p $PYTHON_CACHE
         MAX_RETRIES=5
         RETRY_DELAY=10
-        EXPECTED_SIZE=18655036  # Expected file size in bytes (~18.6 MB)
+        EXPECTED_SIZE=19600672  # 更新为实际文件大小（19,600,672 字节）
         for i in $(seq 1 $MAX_RETRIES); do
           echo "Attempt $i to download Python 3.10.6 source from primary URL..."
           curl -L -o "$PYTHON_FILE" "$PRIMARY_URL" --retry 5 --retry-delay 10 --retry-max-time 120 --connect-timeout 30
