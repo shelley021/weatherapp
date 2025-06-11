@@ -46,7 +46,7 @@ jobs:
         # 以下是新增的依赖，确保 C 编译器可以正常工作
         sudo apt-get install -y gcc g++ make libreadline-dev libsqlite3-dev libbz2-dev liblzma-dev libgdbm-dev libncurses5-dev libncursesw5-dev
         # 额外添加的依赖，确保编译器和链接器正常工作
-        sudo apt-get install -y binutils libc6-dev
+        sudo apt-get install -y binutils libc6-dev libgcc1
     - name: Check compiler functionality
       run: |
         echo "int main() { return 0; }" > test.c
@@ -245,7 +245,6 @@ jobs:
         P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}
       name: Build APK
       run: |
-        buildozer -v android debug deploy --log-level 2 2>&1 | tee -a build.log
         echo "Starting build process..." | tee -a build.log
         export CFLAGS="-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations"
         export CPPFLAGS="-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700"
