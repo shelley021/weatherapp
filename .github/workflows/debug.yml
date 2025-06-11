@@ -245,6 +245,7 @@ jobs:
         P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}
       name: Build APK
       run: |
+        set -o pipefail
         echo "Starting build process..." | tee -a build.log
         export CFLAGS="-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations"
         export CPPFLAGS="-D_GNU_SOURCE -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700"
@@ -257,6 +258,14 @@ jobs:
           cat build.log
           exit 1
         }
+    - name: Check for APK
+      run: |
+        if [ -f bin/weatherapp-*.apk ]; then
+          echo "APK found."
+        else
+          echo "APK not found."
+          exit 1
+        fi
     - name: Check disk space
       run: df -h
     - name: Save Build Log
