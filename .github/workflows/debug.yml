@@ -233,6 +233,7 @@ jobs:
         P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.P4A_RELEASE_KEYSTORE_PASSWD }}
       name: Build APK
       run: |
+        buildozer -v android debug deploy --log-level 2
         set -o pipefail  # 确保管道中的错误被捕获
         echo "Starting build process..." | tee -a build.log
         export CFLAGS="-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations"
