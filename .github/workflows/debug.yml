@@ -234,7 +234,7 @@ jobs:
       name: Build APK
       run: |
         set -x
-        buildozer -v android debug deploy --log-level 2
+        buildozer -v android debug deploy --log-level 2 2>&1 | tee -a build.log
         set -o pipefail  # 确保管道中的错误被捕获
         echo "Starting build process..." | tee -a build.log
         export CFLAGS="-Wno-error=implicit-function-declaration -Wno-error=array-bounds -Wno-error=deprecated-declarations"
@@ -266,3 +266,12 @@ jobs:
         name: weatherapp-apk
         path: bin/weatherapp-*.apk
         retention-days: 2
+
+    - name: Check build.log existence
+      run: |
+       if [ -f build.log ]; then
+         echo "build.log exists."
+         ls -lh build.log
+       else
+         echo "build.log does not exist."
+       fi
