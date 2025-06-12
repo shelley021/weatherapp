@@ -53,6 +53,8 @@ jobs:
         sudo apt-get install -y libssl-dev libffi-dev
         # 添加 libnsl-dev，提供网络服务支持
         sudo apt-get install -y libnsl-dev
+        # 添加 libz-dev，确保 zlib 支持
+        sudo apt-get install -y libz-dev
     - name: Check compiler functionality
       run: |
         echo "int main() { return 0; }" > test.c
