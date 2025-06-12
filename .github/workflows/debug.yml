@@ -55,6 +55,8 @@ jobs:
         sudo apt-get install -y libnsl-dev
         # 添加 libz-dev，确保 zlib 支持
         sudo apt-get install -y libz-dev
+        # 添加 libgdbm-compat-dev，确保 gdbm 兼容性
+        sudo apt-get install -y libgdbm-compat-dev
     - name: Check compiler functionality
       run: |
         echo "int main() { return 0; }" > test.c
@@ -171,7 +173,7 @@ jobs:
     - name: Pre-Download OpenSSL
       run: |
         OPENSSL_URL="https://www.openssl.org/source/openssl-3.0.15.tar.gz"
-        OPENSSL_CACHE="/home/runner/.buildozer/cache"
+        OPENSSL_CACHE="/dev/shm"
         mkdir -p $OPENSSL_CACHE
         MAX_RETRIES=3
         RETRY_DELAY=10
@@ -190,7 +192,7 @@ jobs:
       run: |
         PRIMARY_URL="https://www.python.org/ftp/python/3.10.6/Python-3.10.6.tar.xz"
         FALLBACK_URL="https://mirror.niser.ac.in/python/ftp/python/3.10.6/Python-3.10.6.tar.xz"
-        PYTHON_CACHE="/home/runner/.buildozer/cache"
+        PYTHON_CACHE="/dev/shm"
         PYTHON_FILE="$PYTHON_CACHE/Python-3.10.6.tar.xz"
         mkdir -p $PYTHON_CACHE
         MAX_RETRIES=5
@@ -299,6 +301,16 @@ jobs:
         name: build-log
         path: build.log
         retention-days: 2
+    - name: Push build.log to repository
+      if: always()
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        git add buildlog/build.log
+        git commit -m "Update build.log from CI run" || echo "No changes to commit"
+        git push origin main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - if: success()
       name: Upload APK
       uses: actions/upload-artifact@v4
