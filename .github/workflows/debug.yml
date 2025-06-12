@@ -45,14 +45,14 @@ jobs:
         sudo apt-get install -y libnss3-dev libnss3-tools
         # 以下是新增的依赖，确保 C 编译器可以正常工作
         sudo apt-get install -y gcc g++ make libreadline-dev libsqlite3-dev libbz2-dev liblzma-dev libgdbm-dev libncurses5-dev libncursesw5-dev libexpat-dev
-        # 额外添加的依赖，确保编译器和链接器正常工作
+        # 添加额外的依赖项，确保编译器和链接器正常工作
         sudo apt-get install -y binutils libc6-dev libgcc1
         # 新增的依赖，基于 GitHub 成功案例
         sudo apt-get install -y libdb-dev libxml2-dev libxslt1-dev tk-dev libuuid1 uuid-dev
         # 添加 libssl-dev 和 libffi-dev 以修复 C 编译器问题
         sudo apt-get install -y libssl-dev libffi-dev
-        # 添加支持 LDFLAGS 的依赖
-        sudo apt-get install -y libnsl-dev libresolv
+        # 添加 libnsl-dev，提供网络服务支持
+        sudo apt-get install -y libnsl-dev
     - name: Check compiler functionality
       run: |
         echo "int main() { return 0; }" > test.c
