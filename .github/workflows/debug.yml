@@ -259,8 +259,13 @@ jobs:
         export CFLAGS=""
         export CPPFLAGS=""
         export LDFLAGS=""
-        # Ensure temporary directory is writable
+        # Ensure temporary directory is set and writable
         chmod -R 777 $HOME/tmp
+        echo "TMPDIR=$TMPDIR" | tee -a build.log
+        if [ -z "$TMPDIR" ] || [ ! -d "$TMPDIR" ]; then
+          echo "Error: TMPDIR is not set or directory does not exist" | tee -a build.log
+          exit 1
+        fi
         echo "Environment variables set." | tee -a build.log
         echo "ANDROID_NDK_HOME=$ANDROID_NDK_HOME" | tee -a build.log
         buildozer android clean 2>&1 | tee -a build.log
