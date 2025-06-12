@@ -253,13 +253,13 @@ jobs:
       run: |
         set -o pipefail
         echo "Starting build process..." | tee -a build.log
+        # Explicitly set a minimal environment to avoid conflicts
         export CC=gcc
         export CXX=g++
-        # 简化环境变量，避免与 configure 冲突
         export CFLAGS=""
         export CPPFLAGS=""
         export LDFLAGS=""
-        # 确保临时目录可写
+        # Ensure temporary directory is writable
         chmod -R 777 $HOME/tmp
         echo "Environment variables set." | tee -a build.log
         echo "ANDROID_NDK_HOME=$ANDROID_NDK_HOME" | tee -a build.log
