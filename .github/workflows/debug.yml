@@ -48,7 +48,7 @@ jobs:
         # 额外添加的依赖，确保编译器和链接器正常工作
         sudo apt-get install -y binutils libc6-dev libgcc1
         # 新增的依赖，基于 GitHub 成功案例
-        sudo apt-get install -y libdb-dev libxml2-dev libxslt1-dev tk-dev libuuid1
+        sudo apt-get install -y libdb-dev libxml2-dev libxslt1-dev tk-dev libuuid1 uuid-dev
     - name: Check compiler functionality
       run: |
         echo "int main() { return 0; }" > test.c
