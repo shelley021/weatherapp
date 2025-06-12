@@ -47,6 +47,8 @@ jobs:
         sudo apt-get install -y gcc g++ make libreadline-dev libsqlite3-dev libbz2-dev liblzma-dev libgdbm-dev libncurses5-dev libncursesw5-dev libexpat-dev
         # 额外添加的依赖，确保编译器和链接器正常工作
         sudo apt-get install -y binutils libc6-dev libgcc1
+        # 新增的依赖，基于 GitHub 成功案例
+        sudo apt-get install -y libdb-dev libxml2-dev libxslt1-dev tk-dev libuuid1
     - name: Check compiler functionality
       run: |
         echo "int main() { return 0; }" > test.c
