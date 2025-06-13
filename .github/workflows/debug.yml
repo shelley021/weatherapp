@@ -57,6 +57,8 @@ jobs:
         sudo apt-get install -y libz-dev
         # 添加 libgdbm-compat-dev，确保 gdbm 兼容性
         sudo apt-get install -y libgdbm-compat-dev
+        # 添加 libpython3.10-dev，确保 hostpython3 配置时能找到 Python 3.10 库
+        sudo apt-get install -y libpython3.10-dev
     - name: Check compiler functionality
       run: |
         echo "int main() { return 0; }" > test.c
@@ -278,27 +280,25 @@ jobs:
         }
     - name: Check for config.log if build fails
       if: failure()
-      id: check-config-log
       run: |
         echo "Checking for config.log in .buildozer directory..."
         CONFIG_LOG=$(find .buildozer -name config.log -print -quit)
         if [ -n "$CONFIG_LOG" ] && [ -f "$CONFIG_LOG" ]; then
           echo "Found config.log at: $CONFIG_LOG"
           ls -lh "$CONFIG_LOG"
-          echo "config-log-path=$CONFIG_LOG" >> $GITHUB_OUTPUT
         else
           echo "config.log not found in .buildozer directory."
           echo "This could mean either:"
           echo "1. Buildozer did not execute the step to generate config.log (check build.log for errors before config.log generation)."
           echo "2. The file is generated in an unexpected location (check build.log for any hints on alternative paths)."
-          echo "config-log-path=" >> $GITHUB_OUTPUT
         fi
     - name: Upload config.log if build fails
       if: failure()
       uses: actions/upload-artifact@v4
       with:
         name: config-log
-        path: ${{ steps.check-config-log.outputs.config-log-path }}
+        path: .buildozer/android/platform/build-*/build/other_builds/hostpython3/desktop/hostpython3/config.log
+        if-no-files-found: warn
     - name: Check for APK
       run: |
         if [ -f bin/weatherapp-*.apk ]; then
