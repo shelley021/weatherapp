@@ -265,6 +265,8 @@ jobs:
         export CFLAGS=""
         export CPPFLAGS=""
         export LDFLAGS=""
+        # 添加 Python 3.10 库路径到 LD_LIBRARY_PATH
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/hostedtoolcache/Python/3.10.18/x64/lib
         chmod -R 777 $HOME/tmp
         echo "TMPDIR=$TMPDIR" | tee -a build.log
         if [ -z "$TMPDIR" ] || [ ! -d "$TMPDIR" ]; then
