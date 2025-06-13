@@ -283,7 +283,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: config-log
-        path: .buildozer/android/platform/build-*/build/other_builds/hostpython3/desktop/hostpython3/config.log
+        path: ./buildlog/config.log
     - name: Check for APK
       run: |
         if [ -f bin/weatherapp-*.apk ]; then
