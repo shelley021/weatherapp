@@ -276,24 +276,29 @@ jobs:
           cat build.log
           exit 1
         }
-    - name: Check and Upload config.log if build fails
+    - name: Check for config.log if build fails
       if: failure()
+      id: check-config-log
       run: |
         echo "Checking for config.log in .buildozer directory..."
         CONFIG_LOG=$(find .buildozer -name config.log -print -quit)
         if [ -n "$CONFIG_LOG" ] && [ -f "$CONFIG_LOG" ]; then
           echo "Found config.log at: $CONFIG_LOG"
           ls -lh "$CONFIG_LOG"
+          echo "config-log-path=$CONFIG_LOG" >> $GITHUB_OUTPUT
         else
           echo "config.log not found in .buildozer directory."
           echo "This could mean either:"
           echo "1. Buildozer did not execute the step to generate config.log (check build.log for errors before config.log generation)."
           echo "2. The file is generated in an unexpected location (check build.log for any hints on alternative paths)."
+          echo "config-log-path=" >> $GITHUB_OUTPUT
         fi
+    - name: Upload config.log if build fails
+      if: failure()
       uses: actions/upload-artifact@v4
       with:
         name: config-log
-        path: ${{ steps.check-config-log.outputs.config-log-path || '' }}
+        path: ${{ steps.check-config-log.outputs.config-log-path }}
     - name: Check for APK
       run: |
         if [ -f bin/weatherapp-*.apk ]; then
